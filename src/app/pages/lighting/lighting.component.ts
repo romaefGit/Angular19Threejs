@@ -15,17 +15,18 @@ export class LightingComponent {
   public constructor(private lightSceneService: LightSceneService) {}
 
   public ngOnInit(): void {
-    let lightColor = '#7E5CAD';
+    let lightColor = '#FFFDEC';
 
     this.lightSceneService.createScene(this.lightSceneCanvas, false, true);
 
     this.lightSceneService.addBox(0.7, 0.7, 0.7, 'boxy');
+    this.lightSceneService.addBoxGrid(6, 1.8);
 
     this.lightSceneService.addSphere(0.05, 24, 24, 'boli', lightColor);
     this.lightSceneService.addLight('boli', lightColor);
 
     // It use radiants, so we have to pass that math operation to say rotate 90 degrees
-    this.lightSceneService.setPlane(4, Math.PI / 2, 'planito');
+    this.lightSceneService.setPlane(16, Math.PI / 2, 'planito');
 
     this.lightSceneService.startScene();
     this.lightSceneService.setGui(); // Set controls UI

@@ -126,7 +126,13 @@ export class LightSceneService {
     });
   }
 
-  addBox(w: number, h: number, d: number, name: string = ''): void {
+  addBox(
+    w: number,
+    h: number,
+    d: number,
+    name: string = '',
+    returnObject: boolean = false
+  ): void | THREE.Mesh<THREE.BoxGeometry, THREE.MeshPhongMaterial> {
     let geometry = new THREE.BoxGeometry(w, h, d);
     let material = new THREE.MeshPhongMaterial({
       color: 0x6a5acd,
@@ -134,14 +140,16 @@ export class LightSceneService {
 
     let meshBox = new THREE.Mesh(geometry, material);
 
-    // set name
     if (name != '') meshBox.name = name;
-
-    // to set the element on top of the Horizon line
     meshBox.position.y = meshBox.geometry.parameters.height / 2;
     meshBox.castShadow = true;
 
-    this.scene.add(meshBox);
+    if (!returnObject) {
+      this.scene.add(meshBox);
+      return undefined; // Explicitly return undefined
+    } else {
+      return meshBox;
+    }
   }
 
   addLight(
@@ -207,6 +215,34 @@ export class LightSceneService {
     let light = new THREE.PointLight(color, intensity);
     light.castShadow = true;
     return light;
+  }
+
+  addBoxGrid(amount: number, separationMultiplier: number) {
+    let boxGridGroup = new THREE.Group();
+
+    for (let i = 0; i < amount; i++) {
+      let obj = this.addBox(1, 1, 1, 'cube-' + i, true);
+      if (obj) {
+        obj.position.x = i * separationMultiplier;
+        obj.position.y = obj.geometry.parameters.height / 2;
+        boxGridGroup.add(obj);
+        for (var j = 1; j < amount; j++) {
+          let objTwo = this.addBox(1, 1, 1, 'cube-' + i + '-j', true);
+          if (objTwo) {
+            objTwo.position.x = i * separationMultiplier;
+            objTwo.position.y = objTwo.geometry.parameters.height / 2;
+            objTwo.position.z = j * separationMultiplier;
+            boxGridGroup.add(objTwo);
+          }
+        }
+      }
+    }
+
+    boxGridGroup.position.x = -(separationMultiplier * (amount - 1)) / 2;
+    boxGridGroup.position.z = -(separationMultiplier * (amount - 1)) / 2;
+
+    this.scene.add(boxGridGroup);
+    // return boxGridGroup;
   }
 
   render(): void {
