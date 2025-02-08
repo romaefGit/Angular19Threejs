@@ -6,7 +6,7 @@ import {
   ViewChild,
   ViewEncapsulation,
 } from '@angular/core';
-import { EngineService } from '../../services/engine/engine.service';
+import { EngineService } from '../../core/services/engine/engine.service';
 
 @Component({
   selector: 'app-engine',
