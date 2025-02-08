@@ -3,14 +3,20 @@ import { Routes } from '@angular/router';
 export const routes: Routes = [
   {
     path: '',
-    // path: 'objects-scene',
+    // path: 'lighting',
+    loadComponent: () =>
+      import('./pages/lighting/lighting.component').then(
+        (c) => c.LightingComponent
+      ),
+  },
+  {
+    path: 'objects-scene',
     loadComponent: () =>
       import('./pages/objects/objects.component').then(
         (c) => c.ObjectsComponent
       ),
   },
   {
-    // path: '',
     path: 'simple-scene',
     loadComponent: () =>
       import('./pages/simple-scene/simple-scene.component').then(
