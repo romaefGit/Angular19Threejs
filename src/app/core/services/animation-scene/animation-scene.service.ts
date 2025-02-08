@@ -2,7 +2,6 @@ import { Injectable, OnDestroy, NgZone, ElementRef } from '@angular/core';
 import * as dat from 'dat.gui';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import { RectAreaLightHelper } from 'three/examples/jsm/helpers/RectAreaLightHelper.js';
 
 @Injectable({
   providedIn: 'root',
@@ -39,6 +38,8 @@ export class AnimationSceneService {
     var _this = this;
 
     this.animateGrid(clock);
+
+    this.animateCamera();
 
     requestAnimationFrame(function () {
       _this.update(renderer, scene, camera, controls, clock);
@@ -135,18 +136,44 @@ export class AnimationSceneService {
   }
 
   setCameraRigGui() {
-    var cameraZPosition = new THREE.Group();
-    var cameraXRotation = new THREE.Group();
-    var cameraYRotation = new THREE.Group();
+    let cameraZRotation = new THREE.Group();
+    let cameraYPosition = new THREE.Group();
+    let cameraZPosition = new THREE.Group();
+    let cameraXRotation = new THREE.Group();
+    let cameraYRotation = new THREE.Group();
 
-    cameraZPosition.add(this.camera);
+    cameraZRotation.name = 'cameraZRotation';
+    cameraYPosition.name = 'cameraYPosition';
+    cameraZPosition.name = 'cameraZPosition';
+    cameraXRotation.name = 'cameraXRotation';
+    cameraYRotation.name = 'cameraYRotation';
+
+    cameraZRotation.add(this.camera);
+    cameraYPosition.add(cameraZRotation);
+    cameraZPosition.add(cameraYPosition);
     cameraXRotation.add(cameraZPosition);
     cameraYRotation.add(cameraXRotation);
+
     this.scene.add(cameraYRotation);
+
+    cameraXRotation.rotation.x = 0;
+    cameraYPosition.position.y = 0;
+    cameraZPosition.position.z = 100;
 
     this.gui.add(cameraZPosition.position, 'z', 0, 100);
     this.gui.add(cameraYRotation.rotation, 'y', -Math.PI, Math.PI);
     this.gui.add(cameraXRotation.rotation, 'x', -Math.PI, Math.PI);
+    this.gui.add(cameraZRotation.rotation, 'z', -Math.PI, Math.PI);
+  }
+
+  animateCamera() {
+    let timeElapsed = this.clock.getElapsedTime();
+    let cameraZPosition = this.scene.getObjectByName('cameraZPosition');
+    if (cameraZPosition) cameraZPosition.position.z -= 0.25;
+
+    let cameraZRotation = this.scene.getObjectByName('cameraZRotation');
+    if (cameraZRotation)
+      cameraZRotation.rotation.z = timeElapsed * 1.5 * 0.02 * 2;
   }
 
   addBox(
@@ -275,6 +302,7 @@ export class AnimationSceneService {
       this.cameraHelper = new THREE.CameraHelper(
         this.directionalLight.shadow.camera
       );
+      this.scene.add(this.cameraHelper);
     }
 
     // element for that light like a Gizmo
@@ -282,7 +310,6 @@ export class AnimationSceneService {
     if (sphere) this.directionalLight.add(sphere);
 
     this.scene.add(this.directionalLight);
-    this.scene.add(this.cameraHelper);
   }
 
   addAmbientLight(

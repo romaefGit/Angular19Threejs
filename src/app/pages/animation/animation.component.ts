@@ -27,14 +27,14 @@ export class AnimationComponent {
       false,
       true,
       sceneColor,
-      'orthographic'
+      'perspective'
     );
 
     // Box
     this.animationSceneService.addBox(0.7, 0.7, 0.7, 'boxy');
 
     // Box grid
-    this.animationSceneService.addBoxGrid(6, 1.8, 'boxGridi');
+    this.animationSceneService.addBoxGrid(12, 1.8, 'boxGridi');
 
     // Point Light
     this.animationSceneService.addSphere(0.05, 24, 24, 'boli', lightColor);
@@ -76,7 +76,7 @@ export class AnimationComponent {
     );
 
     // It use radians, so we have to pass that math operation to say rotate 90 degrees
-    this.animationSceneService.setPlane(16, Math.PI / 2, 'planito');
+    this.animationSceneService.setPlane(100, Math.PI / 2, 'planito');
 
     // Set Camera Rig
     this.animationSceneService.setCameraRigGui();
