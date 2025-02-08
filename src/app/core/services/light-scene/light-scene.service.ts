@@ -59,7 +59,8 @@ export class LightSceneService {
 
   createScene(
     canvas: ElementRef<HTMLCanvasElement>,
-    enableFog: boolean = false
+    enableFog: boolean = false,
+    enableShadows: boolean = false
   ): void {
     // create the scene
     this.scene = new THREE.Scene();
@@ -94,6 +95,9 @@ export class LightSceneService {
     });
     this.renderer.setSize(window.innerWidth, window.innerHeight);
     this.renderer.setClearColor('#EFB6C8'); // background color of the scene
+
+    // to active shadows
+    this.renderer.shadowMap.enabled = enableShadows; // the activate that on the objects with .castShadows property
 
     // Fog
     if (enableFog) {
@@ -135,6 +139,7 @@ export class LightSceneService {
 
     // to set the element on top of the Horizon line
     meshBox.position.y = meshBox.geometry.parameters.height / 2;
+    meshBox.castShadow = true;
 
     this.scene.add(meshBox);
   }
@@ -147,6 +152,9 @@ export class LightSceneService {
   ) {
     // add light
     this.pointLight = this.getPointLight(color, intensity);
+    this.pointLight.castShadow = true;
+
+    // element for that light like a Gizmo
     let sphere = this.scene.getObjectByName(objectName);
 
     this.pointLight.position.y = yPos;
@@ -172,7 +180,7 @@ export class LightSceneService {
     // set name
     if (name != '') meshSphere.name = name;
 
-    // meshSphere.position.y = 1;
+    meshSphere.castShadow = true;
 
     this.scene.add(meshSphere);
   }
@@ -180,7 +188,7 @@ export class LightSceneService {
   setPlane(size: number, rotation: number, name: string = '') {
     let geometry = new THREE.PlaneGeometry(size, size);
     let material = new THREE.MeshPhongMaterial({
-      color: 0x009688,
+      color: '#ffff',
       side: THREE.DoubleSide,
     });
     let meshPlane = new THREE.Mesh(geometry, material);
@@ -189,12 +197,15 @@ export class LightSceneService {
     if (name != '') meshPlane.name = name;
 
     meshPlane.rotateX(rotation);
+
+    meshPlane.receiveShadow = true;
+
     this.scene.add(meshPlane);
   }
 
   getPointLight(color: string = '#ffffff', intensity: number) {
     let light = new THREE.PointLight(color, intensity);
-
+    light.castShadow = true;
     return light;
   }
 

@@ -17,7 +17,7 @@ export class LightingComponent {
   public ngOnInit(): void {
     let lightColor = '#7E5CAD';
 
-    this.lightSceneService.createScene(this.lightSceneCanvas);
+    this.lightSceneService.createScene(this.lightSceneCanvas, false, true);
 
     this.lightSceneService.addBox(0.7, 0.7, 0.7, 'boxy');
 
