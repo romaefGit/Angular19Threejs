@@ -11,7 +11,7 @@ export class AnimationSceneService {
   private canvas!: HTMLCanvasElement;
   private renderer!: THREE.WebGLRenderer;
 
-  private camera!: THREE.PerspectiveCamera;
+  private camera!: any; // it will contain perspective and orthographic
   private scene!: THREE.Scene;
   private cameraHelper!: THREE.CameraHelper;
   private clock!: THREE.Clock;
@@ -31,7 +31,7 @@ export class AnimationSceneService {
   update(
     renderer: THREE.WebGLRenderer,
     scene: THREE.Scene,
-    camera: THREE.PerspectiveCamera,
+    camera: THREE.Camera,
     controls: OrbitControls,
     clock: THREE.Clock
   ): void {
@@ -76,29 +76,14 @@ export class AnimationSceneService {
     canvas: ElementRef<HTMLCanvasElement>,
     enableFog: boolean = false,
     enableShadows: boolean = false,
-    color: string = '#EFB6C8'
+    color: string = '#EFB6C8',
+    cameraType: 'orthographic' | 'perspective'
   ): void {
     // create the scene
     this.scene = new THREE.Scene();
 
     // First configuration
-    this.camera = new THREE.PerspectiveCamera(
-      45,
-      window.innerWidth / window.innerHeight,
-      1,
-      1000
-    );
-
-    // Setting camera position
-    this.camera.position.x = 1;
-    this.camera.position.y = 2;
-    this.camera.position.z = 5;
-
-    // This center the camera view to the center of the object
-    this.camera.lookAt(new THREE.Vector3(0, 0, 0));
-
-    // Add camera
-    this.scene.add(this.camera);
+    this.setTypeOfCamera(cameraType);
 
     // renderer config
     this.canvas = canvas.nativeElement;
@@ -121,6 +106,47 @@ export class AnimationSceneService {
     }
 
     // console.log(this.scene);
+  }
+
+  setTypeOfCamera(type: 'orthographic' | 'perspective') {
+    if (type == 'perspective') {
+      this.camera = new THREE.PerspectiveCamera(
+        45,
+        window.innerWidth / window.innerHeight,
+        1,
+        1000
+      );
+      this.camera.position.x = 1;
+      this.camera.position.y = 2;
+      this.camera.position.z = 5;
+    }
+    if (type == 'orthographic') {
+      this.camera = new THREE.OrthographicCamera(-15, 15, 15, -15, 0, 300);
+      this.camera.position.x = 10;
+      this.camera.position.y = 18;
+      this.camera.position.z = -18;
+    }
+
+    // This center the camera view to the center of the object
+    this.camera.lookAt(new THREE.Vector3(0, 0, 0));
+
+    // Add camera
+    this.scene.add(this.camera);
+  }
+
+  setCameraRigGui() {
+    var cameraZPosition = new THREE.Group();
+    var cameraXRotation = new THREE.Group();
+    var cameraYRotation = new THREE.Group();
+
+    cameraZPosition.add(this.camera);
+    cameraXRotation.add(cameraZPosition);
+    cameraYRotation.add(cameraXRotation);
+    this.scene.add(cameraYRotation);
+
+    this.gui.add(cameraZPosition.position, 'z', 0, 100);
+    this.gui.add(cameraYRotation.rotation, 'y', -Math.PI, Math.PI);
+    this.gui.add(cameraXRotation.rotation, 'x', -Math.PI, Math.PI);
   }
 
   addBox(

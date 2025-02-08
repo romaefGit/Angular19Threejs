@@ -26,7 +26,8 @@ export class AnimationComponent {
       this.animationSceneCanvas,
       false,
       true,
-      sceneColor
+      sceneColor,
+      'orthographic'
     );
 
     // Box
@@ -56,7 +57,7 @@ export class AnimationComponent {
       directionalLightColor,
       1,
       false,
-      true
+      false
     );
 
     // Ambient light
@@ -76,6 +77,9 @@ export class AnimationComponent {
 
     // It use radians, so we have to pass that math operation to say rotate 90 degrees
     this.animationSceneService.setPlane(16, Math.PI / 2, 'planito');
+
+    // Set Camera Rig
+    this.animationSceneService.setCameraRigGui();
 
     this.animationSceneService.startScene();
   }
