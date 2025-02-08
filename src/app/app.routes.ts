@@ -3,11 +3,25 @@ import { Routes } from '@angular/router';
 export const routes: Routes = [
   {
     path: '',
-    // path: 'animation',
+    // path: 'textures-and-materials',
+    loadComponent: () =>
+      import(
+        './pages/textures-and-materials/textures-and-materials.component'
+      ).then((c) => c.TexturesAndMaterialsComponent),
+  },
+  {
+    path: 'animation',
     loadComponent: () =>
       import('./pages/animation/animation.component').then(
         (c) => c.AnimationComponent
       ),
+  },
+  {
+    path: 'textures-and-materials',
+    loadComponent: () =>
+      import(
+        './pages/textures-and-materials/textures-and-materials.component'
+      ).then((c) => c.TexturesAndMaterialsComponent),
   },
   {
     path: 'lighting',
