@@ -22,12 +22,12 @@ export class LightingComponent {
     this.lightSceneService.addBox(0.7, 0.7, 0.7, 'boxy');
 
     this.lightSceneService.addSphere(0.05, 24, 24, 'boli', lightColor);
+    this.lightSceneService.addLight('boli', lightColor);
 
     // It use radiants, so we have to pass that math operation to say rotate 90 degrees
     this.lightSceneService.setPlane(4, Math.PI / 2, 'planito');
 
-    this.lightSceneService.addLight('boli', lightColor);
-
     this.lightSceneService.startScene();
+    this.lightSceneService.setGui(); // Set controls UI
   }
 }

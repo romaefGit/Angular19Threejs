@@ -1,6 +1,9 @@
 import { Injectable, OnDestroy, NgZone, ElementRef } from '@angular/core';
+import * as dat from 'dat.gui';
 import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
+// Addons on threeJs https://threejs.org/docs/#manual/en/introduction/Installation
 @Injectable({
   providedIn: 'root',
 })
@@ -13,18 +16,22 @@ export class LightSceneService {
 
   private frameId!: number;
 
+  private gui = new dat.GUI();
+  private pointLight: THREE.PointLight | undefined; // Store the point light
+
   constructor(private ngZone: NgZone) {}
 
   update(
     renderer: THREE.WebGLRenderer,
     scene: THREE.Scene,
-    camera: THREE.PerspectiveCamera
+    camera: THREE.PerspectiveCamera,
+    controls: OrbitControls
   ) {
     this.renderer.render(scene, camera);
     var _this = this;
 
     requestAnimationFrame(function () {
-      _this.update(renderer, scene, camera);
+      _this.update(renderer, scene, camera, controls);
     });
   }
 
@@ -45,7 +52,9 @@ export class LightSceneService {
       });
     });
 
-    this.update(this.renderer, this.scene, this.camera);
+    let controls = new OrbitControls(this.camera, this.renderer.domElement);
+
+    this.update(this.renderer, this.scene, this.camera, controls);
   }
 
   createScene(
@@ -94,6 +103,25 @@ export class LightSceneService {
     // console.log(this.scene);
   }
 
+  setGui() {
+    if (!this.pointLight) {
+      // Check if the light exists
+      console.error('Point light not initialized!');
+      return;
+    }
+
+    this.gui = new dat.GUI();
+
+    this.gui.add(this.pointLight, 'intensity', 0, 10).onChange((value: any) => {
+      // No need to update the scene manually here, Three.js does it
+      // console.log('Intensity changed:', value);
+    });
+
+    this.gui.add(this.pointLight.position, 'y', 0, 5).onChange((value: any) => {
+      // console.log('Y position changed:', value);
+    });
+  }
+
   addBox(w: number, h: number, d: number, name: string = ''): void {
     let geometry = new THREE.BoxGeometry(w, h, d);
     let material = new THREE.MeshPhongMaterial({
@@ -118,14 +146,14 @@ export class LightSceneService {
     intensity: number = 2
   ) {
     // add light
-    let pointLight = this.getPointLight(color, intensity);
+    this.pointLight = this.getPointLight(color, intensity);
     let sphere = this.scene.getObjectByName(objectName);
 
-    pointLight.position.y = yPos;
+    this.pointLight.position.y = yPos;
     // console.log('sphere > ', sphere);
 
-    if (sphere) pointLight.add(sphere);
-    this.scene.add(pointLight);
+    if (sphere) this.pointLight.add(sphere);
+    this.scene.add(this.pointLight);
   }
 
   addSphere(
