@@ -3,7 +3,14 @@ import { Routes } from '@angular/router';
 export const routes: Routes = [
   {
     path: '',
-    // path: 'lighting',
+    // path: 'animation',
+    loadComponent: () =>
+      import('./pages/animation/animation.component').then(
+        (c) => c.AnimationComponent
+      ),
+  },
+  {
+    path: 'lighting',
     loadComponent: () =>
       import('./pages/lighting/lighting.component').then(
         (c) => c.LightingComponent

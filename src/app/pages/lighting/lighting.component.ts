@@ -1,5 +1,4 @@
 import { Component, ViewChild, OnInit, ElementRef } from '@angular/core';
-import { SceneService } from '../../core/services/scene/scene.service';
 import { LightSceneService } from '../../core/services/light-scene/light-scene.service';
 
 @Component({
