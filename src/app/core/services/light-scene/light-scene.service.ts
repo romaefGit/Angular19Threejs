@@ -13,11 +13,14 @@ export class LightSceneService {
 
   private camera!: THREE.PerspectiveCamera;
   private scene!: THREE.Scene;
+  private cameraHelper!: THREE.CameraHelper;
 
   private frameId!: number;
 
   private gui = new dat.GUI();
   private pointLight: THREE.PointLight | undefined; // Store the point light
+  private spotLight: THREE.SpotLight | undefined; // Store the spot light
+  private directionalLight: THREE.DirectionalLight | undefined; // Store the directional light
 
   constructor(private ngZone: NgZone) {}
 
@@ -26,13 +29,17 @@ export class LightSceneService {
     scene: THREE.Scene,
     camera: THREE.PerspectiveCamera,
     controls: OrbitControls
-  ) {
+  ): void {
     this.renderer.render(scene, camera);
     var _this = this;
 
     requestAnimationFrame(function () {
       _this.update(renderer, scene, camera, controls);
     });
+  }
+
+  initGui(): void {
+    this.gui = new dat.GUI();
   }
 
   startScene(): void {
@@ -60,7 +67,8 @@ export class LightSceneService {
   createScene(
     canvas: ElementRef<HTMLCanvasElement>,
     enableFog: boolean = false,
-    enableShadows: boolean = false
+    enableShadows: boolean = false,
+    color: string = '#EFB6C8'
   ): void {
     // create the scene
     this.scene = new THREE.Scene();
@@ -94,7 +102,7 @@ export class LightSceneService {
       antialias: true, // smooth edges
     });
     this.renderer.setSize(window.innerWidth, window.innerHeight);
-    this.renderer.setClearColor('#EFB6C8'); // background color of the scene
+    this.renderer.setClearColor(color); // background color of the scene
 
     // to active shadows
     this.renderer.shadowMap.enabled = enableShadows; // the activate that on the objects with .castShadows property
@@ -105,25 +113,6 @@ export class LightSceneService {
     }
 
     // console.log(this.scene);
-  }
-
-  setGui() {
-    if (!this.pointLight) {
-      // Check if the light exists
-      console.error('Point light not initialized!');
-      return;
-    }
-
-    this.gui = new dat.GUI();
-
-    this.gui.add(this.pointLight, 'intensity', 0, 10).onChange((value: any) => {
-      // No need to update the scene manually here, Three.js does it
-      // console.log('Intensity changed:', value);
-    });
-
-    this.gui.add(this.pointLight.position, 'y', 0, 5).onChange((value: any) => {
-      // console.log('Y position changed:', value);
-    });
   }
 
   addBox(
@@ -156,20 +145,103 @@ export class LightSceneService {
     objectName: string,
     color: string = '#fff',
     yPos: number = 1,
-    intensity: number = 2
+    intensity: number = 2,
+    withGui: boolean = true
   ) {
     // add light
-    this.pointLight = this.getPointLight(color, intensity);
+    this.pointLight = new THREE.PointLight(color, intensity);
     this.pointLight.castShadow = true;
 
     // element for that light like a Gizmo
     let sphere = this.scene.getObjectByName(objectName);
 
     this.pointLight.position.y = yPos;
+
     // console.log('sphere > ', sphere);
+    if (withGui) {
+      this.gui
+        .add(this.pointLight, 'intensity', 0, 10)
+        .onChange((value: any) => {
+          // No need to update the scene manually here, Three.js does it
+          // console.log('Intensity changed:', value);
+        });
+
+      this.gui
+        .add(this.pointLight.position, 'y', 0, 5)
+        .onChange((value: any) => {
+          // console.log('Y position changed:', value);
+        });
+    }
 
     if (sphere) this.pointLight.add(sphere);
     this.scene.add(this.pointLight);
+  }
+
+  addSpotLight(
+    objectName: string,
+    color: string = '#fff',
+    intensity: number,
+    withGui: boolean = true
+  ) {
+    this.spotLight = new THREE.SpotLight(color, intensity);
+
+    this.spotLight.castShadow = true; // to be able to have shadow
+    this.spotLight.shadow.bias = 0.001; // To fix a shadow bordered behind objects
+    this.spotLight.shadow.mapSize.width = 2048;
+    this.spotLight.shadow.mapSize.height = 2048;
+
+    this.scene.add(this.spotLight);
+
+    // element for that light like a Gizmo
+    let sphere = this.scene.getObjectByName(objectName);
+
+    if (withGui) {
+      this.gui.add(this.spotLight, 'intensity', 0, 10);
+      this.gui.add(this.spotLight.position, 'x', 0, 20);
+      this.gui.add(this.spotLight.position, 'y', 0, 20);
+      this.gui.add(this.spotLight.position, 'z', 0, 20);
+      this.gui.add(this.spotLight, 'penumbra', 0, 1);
+    }
+
+    if (sphere) this.spotLight.add(sphere);
+    this.scene.add(this.spotLight);
+    // return light;
+  }
+
+  addDirectionalLight(
+    objectName: string,
+    color: string = '#fff',
+    intensity: number,
+    withGui: boolean = true,
+    withHelper: boolean = false
+  ) {
+    this.directionalLight = new THREE.DirectionalLight(color, intensity);
+    this.directionalLight.castShadow = true;
+
+    this.directionalLight.shadow.camera.left = -10;
+    this.directionalLight.shadow.camera.bottom = -10;
+    this.directionalLight.shadow.camera.right = 10;
+    this.directionalLight.shadow.camera.top = 10;
+
+    if (withGui) {
+      this.gui.add(this.directionalLight, 'intensity', 0, 10);
+      this.gui.add(this.directionalLight.position, 'x', 0, 20);
+      this.gui.add(this.directionalLight.position, 'y', 0, 20);
+      this.gui.add(this.directionalLight.position, 'z', 0, 20);
+    }
+
+    if (withHelper) {
+      this.cameraHelper = new THREE.CameraHelper(
+        this.directionalLight.shadow.camera
+      );
+    }
+
+    // element for that light like a Gizmo
+    let sphere = this.scene.getObjectByName(objectName);
+    if (sphere) this.directionalLight.add(sphere);
+
+    this.scene.add(this.directionalLight);
+    this.scene.add(this.cameraHelper);
   }
 
   addSphere(
@@ -209,12 +281,6 @@ export class LightSceneService {
     meshPlane.receiveShadow = true;
 
     this.scene.add(meshPlane);
-  }
-
-  getPointLight(color: string = '#ffffff', intensity: number) {
-    let light = new THREE.PointLight(color, intensity);
-    light.castShadow = true;
-    return light;
   }
 
   addBoxGrid(amount: number, separationMultiplier: number) {

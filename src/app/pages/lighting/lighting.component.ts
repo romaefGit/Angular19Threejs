@@ -15,20 +15,50 @@ export class LightingComponent {
   public constructor(private lightSceneService: LightSceneService) {}
 
   public ngOnInit(): void {
-    let lightColor = '#FFFDEC';
+    let sceneColor = '#213555';
 
-    this.lightSceneService.createScene(this.lightSceneCanvas, false, true);
+    let lightColor = '#FFFDEC';
+    let spotLightColor = '#79D7BE';
+    let directionalLightColor = '#CDC1FF';
+
+    this.lightSceneService.initGui(); // Set controls UI
+    this.lightSceneService.createScene(
+      this.lightSceneCanvas,
+      false,
+      true,
+      sceneColor
+    );
 
     this.lightSceneService.addBox(0.7, 0.7, 0.7, 'boxy');
     this.lightSceneService.addBoxGrid(6, 1.8);
 
+    // Point Light
     this.lightSceneService.addSphere(0.05, 24, 24, 'boli', lightColor);
-    this.lightSceneService.addLight('boli', lightColor);
+    this.lightSceneService.addLight('boli', lightColor, 2, 2, false);
+
+    // Spot Light
+    this.lightSceneService.addSphere(0.05, 24, 24, 'spoti', spotLightColor);
+    this.lightSceneService.addSpotLight('spoti', spotLightColor, 6, false);
+
+    // Directional Light
+    this.lightSceneService.addSphere(
+      0.05,
+      24,
+      24,
+      'directi',
+      directionalLightColor
+    );
+    this.lightSceneService.addDirectionalLight(
+      'directi',
+      directionalLightColor,
+      1,
+      true,
+      true
+    );
 
     // It use radiants, so we have to pass that math operation to say rotate 90 degrees
     this.lightSceneService.setPlane(16, Math.PI / 2, 'planito');
 
     this.lightSceneService.startScene();
-    this.lightSceneService.setGui(); // Set controls UI
   }
 }
