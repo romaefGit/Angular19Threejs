@@ -2,6 +2,7 @@ import { Injectable, OnDestroy, NgZone, ElementRef } from '@angular/core';
 import * as dat from 'dat.gui';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { RectAreaLightHelper } from 'three/examples/jsm/helpers/RectAreaLightHelper.js';
 
 // Addons on threeJs https://threejs.org/docs/#manual/en/introduction/Installation
 @Injectable({
@@ -18,9 +19,12 @@ export class LightSceneService {
   private frameId!: number;
 
   private gui = new dat.GUI();
-  private pointLight: THREE.PointLight | undefined; // Store the point light
-  private spotLight: THREE.SpotLight | undefined; // Store the spot light
-  private directionalLight: THREE.DirectionalLight | undefined; // Store the directional light
+
+  // Lights
+  private pointLight: THREE.PointLight | undefined;
+  private spotLight: THREE.SpotLight | undefined;
+  private directionalLight: THREE.DirectionalLight | undefined;
+  private ambientLight: THREE.AmbientLight | undefined;
 
   constructor(private ngZone: NgZone) {}
 
@@ -218,10 +222,17 @@ export class LightSceneService {
     this.directionalLight = new THREE.DirectionalLight(color, intensity);
     this.directionalLight.castShadow = true;
 
+    // Shadow
     this.directionalLight.shadow.camera.left = -10;
     this.directionalLight.shadow.camera.bottom = -10;
     this.directionalLight.shadow.camera.right = 10;
     this.directionalLight.shadow.camera.top = 10;
+
+    // Position
+    this.directionalLight.position.x = 13;
+    this.directionalLight.position.y = 10;
+    this.directionalLight.position.z = 10;
+    this.directionalLight.intensity = 2;
 
     if (withGui) {
       this.gui.add(this.directionalLight, 'intensity', 0, 10);
@@ -242,6 +253,46 @@ export class LightSceneService {
 
     this.scene.add(this.directionalLight);
     this.scene.add(this.cameraHelper);
+  }
+
+  addAmbientLight(
+    objectName: string,
+    color: string = '#fff',
+    intensity: number,
+    withGui: boolean = true
+  ) {
+    this.ambientLight = new THREE.AmbientLight(color, intensity);
+
+    if (withGui) {
+      this.gui.add(this.ambientLight, 'intensity', 0, 10);
+      this.gui.add(this.ambientLight.position, 'x', 0, 20);
+      this.gui.add(this.ambientLight.position, 'y', 0, 20);
+      this.gui.add(this.ambientLight.position, 'z', 0, 20);
+    }
+
+    // element for that light like a Gizmo
+    let sphere = this.scene.getObjectByName(objectName);
+    if (sphere) this.ambientLight.add(sphere);
+
+    this.scene.add(this.ambientLight);
+  }
+
+  addReactAreaLight() {
+    const width = 10;
+    const height = 10;
+    const intensity = 1;
+    const rectLight = new THREE.RectAreaLight(
+      0xffffff,
+      intensity,
+      width,
+      height
+    );
+    rectLight.position.set(5, 5, 0);
+    rectLight.lookAt(0, 0, 0);
+    this.scene.add(rectLight);
+
+    const rectLightHelper = new RectAreaLightHelper(rectLight);
+    rectLight.add(rectLightHelper);
   }
 
   addSphere(

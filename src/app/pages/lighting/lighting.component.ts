@@ -20,6 +20,7 @@ export class LightingComponent {
     let lightColor = '#FFFDEC';
     let spotLightColor = '#79D7BE';
     let directionalLightColor = '#CDC1FF';
+    let ambientLightColor = '#DA498D';
 
     this.lightSceneService.initGui(); // Set controls UI
     this.lightSceneService.createScene(
@@ -52,9 +53,27 @@ export class LightingComponent {
       'directi',
       directionalLightColor,
       1,
-      true,
+      false,
       true
     );
+
+    // Ambient light
+    this.lightSceneService.addSphere(
+      0.05,
+      24,
+      24,
+      'ambienti',
+      ambientLightColor
+    );
+    this.lightSceneService.addAmbientLight(
+      'ambienti',
+      ambientLightColor,
+      1,
+      false
+    );
+
+    // react area light test
+    this.lightSceneService.addReactAreaLight();
 
     // It use radiants, so we have to pass that math operation to say rotate 90 degrees
     this.lightSceneService.setPlane(16, Math.PI / 2, 'planito');
