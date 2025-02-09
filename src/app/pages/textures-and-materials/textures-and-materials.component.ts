@@ -86,7 +86,7 @@ export class TexturesAndMaterialsComponent {
       'spherei',
       '#FFFDEC',
       this.textureMaterialService.getMaterial('phong', '#DA498D'),
-      false
+      true
       // {
       //   x: 0,
       //   y: 7,
@@ -100,7 +100,7 @@ export class TexturesAndMaterialsComponent {
       Math.PI / 2,
       'planito',
       this.textureMaterialService.getMaterial('phong', '#ddd'),
-      false
+      true
     );
 
     this.textureMaterialService.startScene();

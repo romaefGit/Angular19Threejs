@@ -120,32 +120,6 @@ export class TextureMaterialSceneService {
     // console.log(this.scene);
   }
 
-  addBox(
-    w: number,
-    h: number,
-    d: number,
-    name: string = '',
-    returnObject: boolean = false
-  ): void | THREE.Mesh<THREE.BoxGeometry, THREE.MeshPhongMaterial> {
-    let geometry = new THREE.BoxGeometry(w, h, d);
-    let material = new THREE.MeshPhongMaterial({
-      color: 0x6a5acd,
-    });
-
-    let meshBox = new THREE.Mesh(geometry, material);
-
-    if (name != '') meshBox.name = name;
-    meshBox.position.y = meshBox.geometry.parameters.height / 2;
-    meshBox.castShadow = true;
-
-    if (!returnObject) {
-      this.scene.add(meshBox);
-      return undefined; // Explicitly return undefined
-    } else {
-      return meshBox;
-    }
-  }
-
   addLight(
     objectName: string,
     color: string = '#fff',
@@ -222,49 +196,6 @@ export class TextureMaterialSceneService {
     // return light;
   }
 
-  addDirectionalLight(
-    objectName: string,
-    color: string = '#fff',
-    intensity: number,
-    withGui: boolean = true,
-    withHelper: boolean = false
-  ) {
-    this.directionalLight = new THREE.DirectionalLight(color, intensity);
-    this.directionalLight.castShadow = true;
-
-    // Shadow
-    this.directionalLight.shadow.camera.left = -10;
-    this.directionalLight.shadow.camera.bottom = -10;
-    this.directionalLight.shadow.camera.right = 10;
-    this.directionalLight.shadow.camera.top = 10;
-
-    // Position
-    this.directionalLight.position.x = 13;
-    this.directionalLight.position.y = 10;
-    this.directionalLight.position.z = 10;
-    this.directionalLight.intensity = 2;
-
-    if (withGui) {
-      this.gui.add(this.directionalLight, 'intensity', 0, 10);
-      this.gui.add(this.directionalLight.position, 'x', 0, 20);
-      this.gui.add(this.directionalLight.position, 'y', 0, 20);
-      this.gui.add(this.directionalLight.position, 'z', 0, 20);
-    }
-
-    if (withHelper) {
-      this.cameraHelper = new THREE.CameraHelper(
-        this.directionalLight.shadow.camera
-      );
-    }
-
-    // element for that light like a Gizmo
-    let sphere = this.scene.getObjectByName(objectName);
-    if (sphere) this.directionalLight.add(sphere);
-
-    this.scene.add(this.directionalLight);
-    this.scene.add(this.cameraHelper);
-  }
-
   addSphere(
     w: number,
     h: number,
@@ -292,8 +223,9 @@ export class TextureMaterialSceneService {
     } else meshSphere.position.y = meshSphere.geometry.parameters.radius;
 
     if (withGui) {
+      console.log('meshSphere  > ', meshSphere);
       var sphereFolder = this.gui.addFolder('folder-' + name);
-      sphereFolder.add(meshSphere, 'shininess', 0, 1000);
+      sphereFolder.add(meshSphere.material, 'shininess', 0, 100);
       sphereFolder.open();
     }
 
@@ -350,7 +282,7 @@ export class TextureMaterialSceneService {
 
     if (withGui) {
       var sphereFolder = this.gui.addFolder('folder-' + name);
-      sphereFolder.add(meshPlane, 'shininess', 0, 1000);
+      sphereFolder.add(meshPlane.material, 'shininess', 0, 100);
       sphereFolder.open();
     }
 
