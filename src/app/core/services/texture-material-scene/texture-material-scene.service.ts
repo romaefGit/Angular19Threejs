@@ -3,6 +3,7 @@ import * as dat from 'dat.gui';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { RectAreaLightHelper } from 'three/examples/jsm/helpers/RectAreaLightHelper.js';
+import { Position } from '../../models/position.model';
 
 @Injectable({
   providedIn: 'root',
@@ -43,6 +44,7 @@ export class TextureMaterialSceneService {
 
   initGui(): void {
     this.gui = new dat.GUI();
+    let folderEmpty = this.gui.addFolder('SOMETHING'); // This solves a problem with the first real creation of a folder
   }
 
   startScene(): void {
@@ -85,9 +87,9 @@ export class TextureMaterialSceneService {
     );
 
     // Setting camera position
-    this.camera.position.x = 1;
-    this.camera.position.y = 2;
-    this.camera.position.z = 5;
+    this.camera.position.z = 7;
+    this.camera.position.x = -2;
+    this.camera.position.y = 7;
 
     // This center the camera view to the center of the object
     this.camera.lookAt(new THREE.Vector3(0, 0, 0));
@@ -184,30 +186,39 @@ export class TextureMaterialSceneService {
     objectName: string,
     color: string = '#fff',
     intensity: number,
-    withGui: boolean = true
+    withGui: boolean = true,
+    position?: Position
   ) {
-    this.spotLight = new THREE.SpotLight(color, intensity);
+    let spotLight = new THREE.SpotLight(color, intensity);
 
-    this.spotLight.castShadow = true; // to be able to have shadow
-    this.spotLight.shadow.bias = 0.001; // To fix a shadow bordered behind objects
-    this.spotLight.shadow.mapSize.width = 2048;
-    this.spotLight.shadow.mapSize.height = 2048;
+    spotLight.castShadow = true; // to be able to have shadow
+    spotLight.shadow.bias = 0.001; // To fix a shadow bordered behind objects
+    spotLight.shadow.mapSize.width = 2048;
+    spotLight.shadow.mapSize.height = 2048;
 
-    this.scene.add(this.spotLight);
+    this.scene.add(spotLight);
 
     // element for that light like a Gizmo
     let sphere = this.scene.getObjectByName(objectName);
 
     if (withGui) {
-      this.gui.add(this.spotLight, 'intensity', 0, 10);
-      this.gui.add(this.spotLight.position, 'x', 0, 20);
-      this.gui.add(this.spotLight.position, 'y', 0, 20);
-      this.gui.add(this.spotLight.position, 'z', 0, 20);
-      this.gui.add(this.spotLight, 'penumbra', 0, 1);
+      let folderLight = this.gui.addFolder('folder-' + objectName);
+      folderLight.add(spotLight, 'intensity', 0, 10);
+      folderLight.add(spotLight.position, 'x', -5, 15);
+      folderLight.add(spotLight.position, 'y', -5, 15);
+      folderLight.add(spotLight.position, 'z', -5, 15);
+      folderLight.add(spotLight, 'penumbra', 0, 1);
+      folderLight.open();
     }
 
-    if (sphere) this.spotLight.add(sphere);
-    this.scene.add(this.spotLight);
+    if (position) {
+      if (position.y) spotLight.position.y = position.y;
+      if (position.x) spotLight.position.x = position.x;
+      if (position.z) spotLight.position.z = position.z;
+    }
+
+    if (sphere) spotLight.add(sphere);
+    this.scene.add(spotLight);
     // return light;
   }
 
@@ -260,22 +271,31 @@ export class TextureMaterialSceneService {
     d: number,
     name: string = '',
     color: string = '#fff',
-    material: any
+    material: any,
+    withGui: boolean,
+    position?: Position
   ): void {
     let geometry = new THREE.SphereGeometry(w, h, d);
-
-    if (!material) {
-      let material = new THREE.MeshBasicMaterial({
-        color: color,
-      });
-    }
 
     let meshSphere = new THREE.Mesh(geometry, material);
     // set name
     if (name != '') meshSphere.name = name;
 
     meshSphere.castShadow = true;
-    meshSphere.position.y = meshSphere.geometry.parameters.radius;
+
+    if (position) {
+      if (!position.y) {
+        meshSphere.position.y = meshSphere.geometry.parameters.radius;
+      } else meshSphere.position.y = position.y;
+      if (position.x) meshSphere.position.x = position.x;
+      if (position.z) meshSphere.position.z = position.z;
+    } else meshSphere.position.y = meshSphere.geometry.parameters.radius;
+
+    if (withGui) {
+      var sphereFolder = this.gui.addFolder('folder-' + name);
+      sphereFolder.add(meshSphere, 'shininess', 0, 1000);
+      sphereFolder.open();
+    }
 
     this.scene.add(meshSphere);
   }
@@ -310,12 +330,15 @@ export class TextureMaterialSceneService {
     return selectedMaterial;
   }
 
-  setPlane(size: number, rotation: number, name: string = '') {
+  setPlane(
+    size: number,
+    rotation: number,
+    name: string = '',
+    material: any,
+    withGui?: boolean
+  ) {
     let geometry = new THREE.PlaneGeometry(size, size);
-    let material = new THREE.MeshPhongMaterial({
-      color: '#ffff',
-      side: THREE.DoubleSide,
-    });
+    material.side = THREE.DoubleSide;
     let meshPlane = new THREE.Mesh(geometry, material);
 
     // set name
@@ -324,6 +347,12 @@ export class TextureMaterialSceneService {
     meshPlane.rotateX(rotation);
 
     meshPlane.receiveShadow = true;
+
+    if (withGui) {
+      var sphereFolder = this.gui.addFolder('folder-' + name);
+      sphereFolder.add(meshPlane, 'shininess', 0, 1000);
+      sphereFolder.open();
+    }
 
     this.scene.add(meshPlane);
   }

@@ -18,8 +18,7 @@ export class TexturesAndMaterialsComponent {
   public ngOnInit(): void {
     let sceneColor = '#213555';
 
-    let lightColor = '#FFFDEC';
-    let spotLightColor = '#79D7BE';
+    let spotLightColor = '#FFFDEC';
     let directionalLightColor = '#CDC1FF';
     let ambientLightColor = '#DA498D';
 
@@ -31,57 +30,78 @@ export class TexturesAndMaterialsComponent {
       sceneColor
     );
 
-    // Add sphere with material
-    this.textureMaterialService.addSphere(
-      0.7,
-      25,
-      25,
-      'boxy',
-      '#FFFDEC',
-      this.textureMaterialService.getMaterial('lambert', '#DA498D')
-    );
-
-    // Point Light
-    // this.textureMaterialService.addSphere(
-    //   0.05,
-    //   24,
-    //   24,
-    //   'boli',
-    //   lightColor,
-    //   this.textureMaterialService.getMaterial('basic')
-    // );
-    // this.textureMaterialService.addLight('boli', lightColor, 2, 2, false);
-
-    // Spot Light
-    // this.textureMaterialService.addSphere(
-    //   0.05,
-    //   24,
-    //   24,
-    //   'spoti',
-    //   spotLightColor,
-    //   this.textureMaterialService.getMaterial('basic')
-    // );
-    // this.textureMaterialService.addSpotLight('spoti', spotLightColor, 6, false);
-
-    // Directional Light
+    // Spot Left Light
+    let positionLeftLight = {
+      x: -2,
+      y: 2,
+      z: -2,
+    };
     this.textureMaterialService.addSphere(
       0.05,
       24,
       24,
-      'directi',
-      directionalLightColor,
-      this.textureMaterialService.getMaterial('basic')
-    );
-    this.textureMaterialService.addDirectionalLight(
-      'directi',
-      directionalLightColor,
-      1,
+      'left-spoti',
+      spotLightColor,
+      this.textureMaterialService.getMaterial('basic'),
       false,
+      positionLeftLight
+    );
+    this.textureMaterialService.addSpotLight(
+      'left-spoti',
+      spotLightColor,
+      6,
+      true,
+      positionLeftLight
+    );
+
+    // Spot Right Light
+    let positionRightLight = {
+      x: 2,
+      y: 2,
+      z: -2,
+    };
+    this.textureMaterialService.addSphere(
+      0.05,
+      24,
+      24,
+      'right-spoti',
+      spotLightColor,
+      this.textureMaterialService.getMaterial('basic'),
+      false,
+      positionRightLight
+    );
+    this.textureMaterialService.addSpotLight(
+      'right-spoti',
+      spotLightColor,
+      6,
+      true,
+      positionRightLight
+    );
+
+    // Add sphere with material
+    this.textureMaterialService.addSphere(
+      1,
+      25,
+      25,
+      'spherei',
+      '#FFFDEC',
+      this.textureMaterialService.getMaterial('phong', '#DA498D'),
       false
+      // {
+      //   x: 0,
+      //   y: 7,
+      //   z: 0,
+      // }
     );
 
     // It use radiants, so we have to pass that math operation to say rotate 90 degrees
-    this.textureMaterialService.setPlane(16, Math.PI / 2, 'planito');
+    this.textureMaterialService.setPlane(
+      16,
+      Math.PI / 2,
+      'planito',
+      this.textureMaterialService.getMaterial('phong', '#ddd'),
+      false
+    );
 
     this.textureMaterialService.startScene();
   }
