@@ -2,7 +2,7 @@
   "lockfileVersion": 1,
   "workspaces": {
     "": {
-      "name": "angular-18-threejs",
+      "name": "angular-19-threejs",
       "dependencies": {
         "@angular/animations": "^19.0.0",
         "@angular/common": "^19.0.0",

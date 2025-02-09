@@ -274,7 +274,43 @@ export class TextureMaterialSceneService {
     return selectedMaterial;
   }
 
-  setPlane(
+  /**
+   * Set textures
+   * callback of loader
+   * loader.load(
+        texturePath,  // Correct path for Angular's assets folder
+        (texture) => {
+          console.log(texture)
+        },
+        (xhr) => {
+            console.log((xhr.loaded / xhr.total * 100) + '% loaded'); // Optional progress
+        },
+        (err) => {
+            console.error("Error loading texture:", err);
+        }
+    );
+   * @param meshPlane
+   * @param texturePath example 'assets/textures/concrete.jpg'
+   */
+  async setTextures(meshPlane: any, texturePath: string) {
+    let loader = new THREE.TextureLoader();
+    meshPlane.material.map = loader.load(texturePath);
+    meshPlane.material.bumpMap = loader.load(texturePath);
+    meshPlane.material.bumpScale = 20;
+
+    let maps = ['map', 'bumpMap'];
+    await maps.forEach(async function (mapName) {
+      let texture = meshPlane.material[mapName];
+      texture.wrapS = THREE.RepeatWrapping;
+      texture.wrapT = THREE.RepeatWrapping;
+      texture.repeat.set(1.5, 1.5);
+    });
+    meshPlane.material.needsUpdate = true;
+
+    return meshPlane;
+  }
+
+  async setPlane(
     size: number,
     rotation: number,
     name: string = '',
@@ -282,8 +318,8 @@ export class TextureMaterialSceneService {
     withGui?: boolean
   ) {
     let geometry = new THREE.PlaneGeometry(size, size);
-    material.side = THREE.DoubleSide;
     let meshPlane = new THREE.Mesh(geometry, material);
+    meshPlane.material.side = THREE.DoubleSide;
 
     // set name
     if (name != '') meshPlane.name = name;
@@ -291,6 +327,11 @@ export class TextureMaterialSceneService {
     meshPlane.rotateX(rotation);
 
     meshPlane.receiveShadow = true;
+
+    meshPlane = await this.setTextures(
+      meshPlane,
+      'assets/textures/concrete.jpg'
+    );
 
     if (withGui) {
       var planeFolder = this.gui.addFolder('folder-' + name);

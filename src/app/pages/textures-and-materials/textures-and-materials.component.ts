@@ -96,10 +96,10 @@ export class TexturesAndMaterialsComponent {
 
     // It use radiants, so we have to pass that math operation to say rotate 90 degrees
     this.textureMaterialService.setPlane(
-      16,
+      30,
       Math.PI / 2,
       'planito',
-      this.textureMaterialService.getMaterial('standard', '#ddd'),
+      this.textureMaterialService.getMaterial('standard', 'rgb(255, 255, 255)'),
       true
     );
 
