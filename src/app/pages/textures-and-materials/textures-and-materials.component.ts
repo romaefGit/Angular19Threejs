@@ -44,6 +44,7 @@ export class TexturesAndMaterialsComponent {
       spotLightColor,
       this.textureMaterialService.getMaterial('basic'),
       false,
+      false,
       positionLeftLight
     );
     this.textureMaterialService.addSpotLight(
@@ -68,6 +69,7 @@ export class TexturesAndMaterialsComponent {
       spotLightColor,
       this.textureMaterialService.getMaterial('basic'),
       false,
+      false,
       positionRightLight
     );
     this.textureMaterialService.addSpotLight(
@@ -86,6 +88,7 @@ export class TexturesAndMaterialsComponent {
       'spherei',
       '#FFFDEC',
       this.textureMaterialService.getMaterial('standard', '#DA498D'),
+      true,
       true
       // {
       //   x: 0,
@@ -96,12 +99,14 @@ export class TexturesAndMaterialsComponent {
 
     // It use radiants, so we have to pass that math operation to say rotate 90 degrees
     this.textureMaterialService.setPlane(
-      30,
+      300,
       Math.PI / 2,
       'planito',
       this.textureMaterialService.getMaterial('standard', 'rgb(255, 255, 255)'),
       true
     );
+
+    this.textureMaterialService.addCubeMap();
 
     this.textureMaterialService.startScene();
   }

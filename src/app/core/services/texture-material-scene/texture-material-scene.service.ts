@@ -22,9 +22,9 @@ export class TextureMaterialSceneService {
 
   // Lights
   private pointLight: THREE.PointLight | undefined;
-  private spotLight: THREE.SpotLight | undefined;
-  private directionalLight: THREE.DirectionalLight | undefined;
-  private ambientLight: THREE.AmbientLight | undefined;
+
+  // Reflection cube
+  private reflectionCube: any;
 
   constructor(private ngZone: NgZone) {}
 
@@ -204,6 +204,7 @@ export class TextureMaterialSceneService {
     color: string = '#fff',
     material: any,
     withGui: boolean,
+    setEnvMap: boolean,
     position?: Position
   ) {
     let geometry = new THREE.SphereGeometry(w, h, d);
@@ -229,12 +230,13 @@ export class TextureMaterialSceneService {
     // Adding texture
     meshSphere = await this.setTextures(
       meshSphere,
-      'assets/textures/fingerprints.jpg',
+      'assets/textures/checkerboard.jpg',
       ['roughnessMap']
     );
     // values
     meshSphere.material.roughness = 0.7;
     meshSphere.material.metalness = 0.5;
+    if (setEnvMap) meshSphere.material.envMap = this.reflectionCube;
 
     if (withGui) {
       // console.log('meshSphere  > ', meshSphere);
@@ -275,12 +277,15 @@ export class TextureMaterialSceneService {
     // Textures
     meshPlane = await this.setTextures(
       meshPlane,
-      'assets/textures/checkerboard.jpg'
+      'assets/textures/concrete.jpg',
+      ['map', 'bumpMap', 'roughnessMap'],
+      15
     );
     // values
     meshPlane.material.bumpScale = 5;
     meshPlane.material.metalness = 0.3;
     meshPlane.material.roughness = 0.7;
+    meshPlane.material.envMap = this.reflectionCube;
 
     if (withGui) {
       var planeFolder = this.gui.addFolder('folder-' + name);
@@ -297,6 +302,25 @@ export class TextureMaterialSceneService {
     }
 
     this.scene.add(meshPlane);
+  }
+
+  addCubeMap() {
+    let path = 'assets/cubemap/';
+    let format = '.jpg';
+    let urls = [
+      path + 'px' + format,
+      path + 'nx' + format,
+      path + 'py' + format,
+      path + 'ny' + format,
+      path + 'pz' + format,
+      path + 'nz' + format,
+    ];
+    let reflectionCube = new THREE.CubeTextureLoader().load(urls);
+    reflectionCube.format = THREE.RGBAFormat;
+
+    this.scene.background = reflectionCube;
+
+    this.reflectionCube = reflectionCube;
   }
 
   /**
@@ -317,6 +341,7 @@ export class TextureMaterialSceneService {
    * @param meshObject
    * @param texturePath example 'assets/textures/concrete.jpg'
    * @param mapTypes to set some by default or just send the one that you want
+   * @param repeatQuantity 
    */
   async setTextures(
     meshObject: any,
