@@ -196,7 +196,7 @@ export class TextureMaterialSceneService {
     // return light;
   }
 
-  addSphere(
+  async addSphere(
     w: number,
     h: number,
     d: number,
@@ -205,7 +205,7 @@ export class TextureMaterialSceneService {
     material: any,
     withGui: boolean,
     position?: Position
-  ): void {
+  ) {
     let geometry = new THREE.SphereGeometry(w, h, d);
 
     let meshSphere = new THREE.Mesh(geometry, material);
@@ -226,6 +226,16 @@ export class TextureMaterialSceneService {
       meshSphere.position.y = meshSphere.geometry.parameters.radius;
     }
 
+    // Adding texture
+    meshSphere = await this.setTextures(
+      meshSphere,
+      'assets/textures/fingerprints.jpg',
+      ['roughnessMap']
+    );
+    // values
+    meshSphere.material.roughness = 0.7;
+    meshSphere.material.metalness = 0.5;
+
     if (withGui) {
       // console.log('meshSphere  > ', meshSphere);
       var sphereFolder = this.gui.addFolder('folder-' + name);
@@ -242,6 +252,88 @@ export class TextureMaterialSceneService {
     }
 
     this.scene.add(meshSphere);
+  }
+
+  async setPlane(
+    size: number,
+    rotation: number,
+    name: string = '',
+    material: any,
+    withGui?: boolean
+  ) {
+    let geometry = new THREE.PlaneGeometry(size, size);
+    let meshPlane = new THREE.Mesh(geometry, material);
+    meshPlane.material.side = THREE.DoubleSide;
+
+    // set name
+    if (name != '') meshPlane.name = name;
+
+    meshPlane.rotateX(rotation);
+
+    meshPlane.receiveShadow = true;
+
+    // Textures
+    meshPlane = await this.setTextures(
+      meshPlane,
+      'assets/textures/checkerboard.jpg'
+    );
+    // values
+    meshPlane.material.bumpScale = 5;
+    meshPlane.material.metalness = 0.3;
+    meshPlane.material.roughness = 0.7;
+
+    if (withGui) {
+      var planeFolder = this.gui.addFolder('folder-' + name);
+      if (meshPlane.material && 'shininess' in meshPlane.material) {
+        planeFolder.add(meshPlane.material, 'shininess', 0, 1000);
+      }
+      if (meshPlane.material && 'roughness' in meshPlane.material) {
+        planeFolder.add(meshPlane.material, 'roughness', 0, 1);
+      }
+      if (meshPlane.material && 'metalness' in meshPlane.material) {
+        planeFolder.add(meshPlane.material, 'metalness', 0, 1);
+      }
+      planeFolder.open();
+    }
+
+    this.scene.add(meshPlane);
+  }
+
+  /**
+   * Set textures
+   * callback of loader
+   * loader.load(
+        texturePath,  // Correct path for Angular's assets folder
+        (texture) => {
+          console.log(texture)
+        },
+        (xhr) => {
+            console.log((xhr.loaded / xhr.total * 100) + '% loaded'); // Optional progress
+        },
+        (err) => {
+            console.error("Error loading texture:", err);
+        }
+    );
+   * @param meshObject
+   * @param texturePath example 'assets/textures/concrete.jpg'
+   * @param mapTypes to set some by default or just send the one that you want
+   */
+  async setTextures(
+    meshObject: any,
+    texturePath: string,
+    mapTypes: string[] = ['map', 'bumpMap', 'roughnessMap'],
+    repeatQuantity: number = 1.5
+  ) {
+    let loader = new THREE.TextureLoader();
+    await mapTypes.forEach(async (mapName) => {
+      meshObject.material[mapName] = loader.load(texturePath);
+      meshObject.material[mapName].wrapS = THREE.RepeatWrapping;
+      meshObject.material[mapName].wrapT = THREE.RepeatWrapping;
+      meshObject.material[mapName].repeat.set(repeatQuantity, repeatQuantity);
+    });
+    meshObject.material.needsUpdate = true;
+
+    return meshObject;
   }
 
   getMaterial(
@@ -272,82 +364,6 @@ export class TextureMaterialSceneService {
     }
 
     return selectedMaterial;
-  }
-
-  /**
-   * Set textures
-   * callback of loader
-   * loader.load(
-        texturePath,  // Correct path for Angular's assets folder
-        (texture) => {
-          console.log(texture)
-        },
-        (xhr) => {
-            console.log((xhr.loaded / xhr.total * 100) + '% loaded'); // Optional progress
-        },
-        (err) => {
-            console.error("Error loading texture:", err);
-        }
-    );
-   * @param meshPlane
-   * @param texturePath example 'assets/textures/concrete.jpg'
-   */
-  async setTextures(meshPlane: any, texturePath: string) {
-    let loader = new THREE.TextureLoader();
-    meshPlane.material.map = loader.load(texturePath);
-    meshPlane.material.bumpMap = loader.load(texturePath);
-    meshPlane.material.bumpScale = 20;
-
-    let maps = ['map', 'bumpMap'];
-    await maps.forEach(async function (mapName) {
-      let texture = meshPlane.material[mapName];
-      texture.wrapS = THREE.RepeatWrapping;
-      texture.wrapT = THREE.RepeatWrapping;
-      texture.repeat.set(1.5, 1.5);
-    });
-    meshPlane.material.needsUpdate = true;
-
-    return meshPlane;
-  }
-
-  async setPlane(
-    size: number,
-    rotation: number,
-    name: string = '',
-    material: any,
-    withGui?: boolean
-  ) {
-    let geometry = new THREE.PlaneGeometry(size, size);
-    let meshPlane = new THREE.Mesh(geometry, material);
-    meshPlane.material.side = THREE.DoubleSide;
-
-    // set name
-    if (name != '') meshPlane.name = name;
-
-    meshPlane.rotateX(rotation);
-
-    meshPlane.receiveShadow = true;
-
-    meshPlane = await this.setTextures(
-      meshPlane,
-      'assets/textures/concrete.jpg'
-    );
-
-    if (withGui) {
-      var planeFolder = this.gui.addFolder('folder-' + name);
-      if (meshPlane.material && 'shininess' in meshPlane.material) {
-        planeFolder.add(meshPlane.material, 'shininess', 0, 1000);
-      }
-      if (meshPlane.material && 'roughness' in meshPlane.material) {
-        planeFolder.add(meshPlane.material, 'roughness', 0, 1);
-      }
-      if (meshPlane.material && 'metalness' in meshPlane.material) {
-        planeFolder.add(meshPlane.material, 'metalness', 0, 1);
-      }
-      planeFolder.open();
-    }
-
-    this.scene.add(meshPlane);
   }
 
   render(): void {
