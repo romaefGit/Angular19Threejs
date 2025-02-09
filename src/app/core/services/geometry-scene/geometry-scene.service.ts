@@ -450,11 +450,12 @@ export class GeometrySceneService {
     let textureLoader = new THREE.TextureLoader();
     let _this = this;
     loader.load(
+      // '/assets/models/head/lee-perry-smith-head-scan.obj',
       '/assets/models/neil/textures_and_color_neil_medium.obj',
       function (object) {
         let colorMap = textureLoader.load('/assets/models/head/Face_Color.jpg');
         let bumpMap = textureLoader.load('/assets/models/head/Face_Disp.jpg');
-        let faceMaterial = _this.getMaterial('standard', '#497D74', true);
+        let faceMaterial = _this.getMaterial('standard', '#fff', false);
 
         object.traverse((child: any) => {
           if (child.name == 'Plane') {
