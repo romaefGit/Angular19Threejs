@@ -3,7 +3,14 @@ import { Routes } from '@angular/router';
 export const routes: Routes = [
   {
     path: '',
-    // path: 'textures-and-materials',
+    // path: 'geometry',
+    loadComponent: () =>
+      import('./pages/geometry/geometry.component').then(
+        (c) => c.GeometryComponent
+      ),
+  },
+  {
+    path: 'textures-and-materials',
     loadComponent: () =>
       import(
         './pages/textures-and-materials/textures-and-materials.component'

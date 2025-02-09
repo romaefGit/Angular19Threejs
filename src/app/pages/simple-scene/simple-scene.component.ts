@@ -1,4 +1,4 @@
-import { Component, ViewChild, OnInit, ElementRef } from '@angular/core';
+import { Component, ViewChild, ElementRef } from '@angular/core';
 import { SceneService } from '../../core/services/scene/scene.service';
 
 @Component({
@@ -7,7 +7,7 @@ import { SceneService } from '../../core/services/scene/scene.service';
   templateUrl: './simple-scene.component.html',
   styleUrl: './simple-scene.component.scss',
 })
-export class SimpleSceneComponent implements OnInit {
+export class SimpleSceneComponent {
   @ViewChild('simpleScene', { static: true })
   public simpleSceneCanvas!: ElementRef<HTMLCanvasElement>;
 

@@ -1,4 +1,4 @@
-import { Component, ViewChild, OnInit, ElementRef } from '@angular/core';
+import { Component, ViewChild, ElementRef } from '@angular/core';
 import { LightSceneService } from '../../core/services/light-scene/light-scene.service';
 
 @Component({

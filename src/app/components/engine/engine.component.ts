@@ -2,7 +2,6 @@ import {
   ChangeDetectionStrategy,
   Component,
   ElementRef,
-  OnInit,
   ViewChild,
   ViewEncapsulation,
 } from '@angular/core';
@@ -14,7 +13,7 @@ import { EngineService } from '../../core/services/engine/engine.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './engine.component.html',
 })
-export class EngineComponent implements OnInit {
+export class EngineComponent {
   @ViewChild('rendererCanvas', { static: true })
   public rendererCanvas!: ElementRef<HTMLCanvasElement>;
 

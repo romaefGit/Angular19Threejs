@@ -1,20 +1,21 @@
-import { Injectable, NgZone, ElementRef } from '@angular/core';
+import { Injectable, OnDestroy, NgZone, ElementRef } from '@angular/core';
 import * as dat from 'dat.gui';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { Position } from '../../models/position.model';
+import { GeometryTypes } from '../../models/geometry.type';
 import { MaterialTypes } from '../../models/material.type';
 
 @Injectable({
   providedIn: 'root',
 })
-export class TextureMaterialSceneService {
+export class GeometrySceneService {
   private canvas!: HTMLCanvasElement;
   private renderer!: THREE.WebGLRenderer;
 
   private camera!: THREE.PerspectiveCamera;
   private scene!: THREE.Scene;
-  private cameraHelper!: THREE.CameraHelper;
+  private clock!: THREE.Clock;
 
   private frameId!: number;
 
@@ -32,19 +33,22 @@ export class TextureMaterialSceneService {
     renderer: THREE.WebGLRenderer,
     scene: THREE.Scene,
     camera: THREE.PerspectiveCamera,
-    controls: OrbitControls
+    controls: OrbitControls,
+    clock: THREE.Clock
   ): void {
     this.renderer.render(scene, camera);
     var _this = this;
 
+    this.animateWavePlane(clock);
+
     requestAnimationFrame(function () {
-      _this.update(renderer, scene, camera, controls);
+      _this.update(renderer, scene, camera, controls, clock);
     });
   }
 
   initGui(): void {
     this.gui = new dat.GUI();
-    let folderEmpty = this.gui.addFolder('SOMETHING'); // This solves a problem with the first real creation of a folder
+    this.gui.addFolder('SOMETHING'); // This solves a problem with the first real creation of a folder
   }
 
   startScene(): void {
@@ -65,8 +69,9 @@ export class TextureMaterialSceneService {
     });
 
     let controls = new OrbitControls(this.camera, this.renderer.domElement);
+    this.clock = new THREE.Clock();
 
-    this.update(this.renderer, this.scene, this.camera, controls);
+    this.update(this.renderer, this.scene, this.camera, controls, this.clock);
   }
 
   createScene(
@@ -304,6 +309,85 @@ export class TextureMaterialSceneService {
     this.scene.add(meshPlane);
   }
 
+  async setWavePlane(
+    size: number,
+    segments: number,
+    rotation: number,
+    name: string = '',
+    material: any,
+    withGui?: boolean
+  ) {
+    let geometry = new THREE.PlaneGeometry(size, size, segments, segments);
+    let meshWave = new THREE.Mesh(geometry, material);
+
+    meshWave.material.side = THREE.DoubleSide;
+
+    // set name
+    if (name != '') meshWave.name = name;
+
+    meshWave.rotateX(rotation);
+
+    meshWave.receiveShadow = true;
+
+    // Textures
+    meshWave = await this.setTextures(
+      meshWave,
+      'assets/textures/concrete.jpg',
+      ['map', 'bumpMap', 'roughnessMap'],
+      15
+    );
+    // values
+    meshWave.material.bumpScale = 5;
+    meshWave.material.metalness = 0.3;
+    meshWave.material.roughness = 0.7;
+    meshWave.material.envMap = this.reflectionCube;
+
+    if (withGui) {
+      var planeFolder = this.gui.addFolder('folder-' + name);
+      if (meshWave.material && 'shininess' in meshWave.material) {
+        planeFolder.add(meshWave.material, 'shininess', 0, 1000);
+      }
+      if (meshWave.material && 'roughness' in meshWave.material) {
+        planeFolder.add(meshWave.material, 'roughness', 0, 1);
+      }
+      if (meshWave.material && 'metalness' in meshWave.material) {
+        planeFolder.add(meshWave.material, 'metalness', 0, 1);
+      }
+      planeFolder.open();
+    }
+
+    meshWave.name = 'plane-wave';
+    this.scene.add(meshWave);
+  }
+
+  animateWavePlane(clock: THREE.Clock) {
+    let elapsedTime = clock.getElapsedTime();
+    let plane = this.scene.getObjectByName('plane-wave') as THREE.Mesh; // Type assertion
+
+    if (plane) {
+      let geometry = plane.geometry as THREE.BufferGeometry; // Type assertion
+      let positionAttribute = geometry.getAttribute(
+        'position'
+      ) as THREE.BufferAttribute;
+
+      if (positionAttribute) {
+        for (let i = 0; i < positionAttribute.count; i++) {
+          let vertexZ = Math.sin(elapsedTime + i * 0.1) * 0.5;
+
+          // Get the current vertex position (x, y, z)
+          let x = positionAttribute.getX(i);
+          let y = positionAttribute.getY(i);
+          // Modify the z component
+          positionAttribute.setXYZ(i, x, y, vertexZ); // Set the new vertex position
+        }
+
+        positionAttribute.needsUpdate = true; // Very important!
+      } else {
+        console.warn("Plane geometry doesn't have a 'position' attribute.");
+      }
+    }
+  }
+
   addCubeMap() {
     let path = 'assets/cubemap/';
     let format = '.jpg';
@@ -361,9 +445,14 @@ export class TextureMaterialSceneService {
     return meshObject;
   }
 
-  getMaterial(type: MaterialTypes, color: string = '#fff') {
+  getMaterial(
+    type: MaterialTypes,
+    color: string = '#fff',
+    wireframe?: boolean
+  ) {
     let materialOptions = {
       color: color,
+      wireframe: wireframe,
     };
     let selectedMaterial: any;
 
@@ -386,6 +475,74 @@ export class TextureMaterialSceneService {
     }
 
     return selectedMaterial;
+  }
+
+  createGeometry(
+    name: string,
+    type: GeometryTypes,
+    size: number,
+    materialType: MaterialTypes,
+    wireframe: boolean,
+    color: string = '#fff'
+  ) {
+    let geometry;
+    let segmentMultiplier = 0.25;
+
+    switch (type) {
+      case 'box':
+        geometry = new THREE.BoxGeometry(size, size, size);
+        break;
+      case 'cone':
+        geometry = new THREE.ConeGeometry(size, size, 256 * segmentMultiplier);
+        break;
+      case 'cylinder':
+        geometry = new THREE.CylinderGeometry(
+          size,
+          size,
+          size,
+          32 * segmentMultiplier
+        );
+        break;
+      case 'octahedron':
+        geometry = new THREE.OctahedronGeometry(size);
+        break;
+      case 'sphere':
+        geometry = new THREE.SphereGeometry(
+          size,
+          32 * segmentMultiplier,
+          32 * segmentMultiplier
+        );
+        break;
+      case 'tetrahedron':
+        geometry = new THREE.TetrahedronGeometry(size);
+        break;
+      case 'torus':
+        geometry = new THREE.TorusGeometry(
+          size / 2,
+          size / 4,
+          16 * segmentMultiplier,
+          100 * segmentMultiplier
+        );
+        break;
+      case 'torusKnot':
+        geometry = new THREE.TorusKnotGeometry(
+          size / 2,
+          size / 6,
+          256 * segmentMultiplier,
+          100 * segmentMultiplier
+        );
+        break;
+      default:
+        break;
+    }
+
+    let mate = this.getMaterial(materialType, color, wireframe);
+
+    let mesh = new THREE.Mesh(geometry, mate);
+    mesh.castShadow = true;
+    mesh.name = type + '-' + name;
+
+    this.scene.add(mesh);
   }
 
   render(): void {
