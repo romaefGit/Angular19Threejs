@@ -85,7 +85,7 @@ export class TexturesAndMaterialsComponent {
       25,
       'spherei',
       '#FFFDEC',
-      this.textureMaterialService.getMaterial('phong', '#DA498D'),
+      this.textureMaterialService.getMaterial('standard', '#DA498D'),
       true
       // {
       //   x: 0,
@@ -99,7 +99,7 @@ export class TexturesAndMaterialsComponent {
       16,
       Math.PI / 2,
       'planito',
-      this.textureMaterialService.getMaterial('phong', '#ddd'),
+      this.textureMaterialService.getMaterial('standard', '#ddd'),
       true
     );
 

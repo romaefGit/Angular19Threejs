@@ -217,15 +217,27 @@ export class TextureMaterialSceneService {
     if (position) {
       if (!position.y) {
         meshSphere.position.y = meshSphere.geometry.parameters.radius;
-      } else meshSphere.position.y = position.y;
+      }
       if (position.x) meshSphere.position.x = position.x;
+      if (position.y) meshSphere.position.y = position.y;
       if (position.z) meshSphere.position.z = position.z;
-    } else meshSphere.position.y = meshSphere.geometry.parameters.radius;
+    } else {
+      // to center the sphere on top of the plane
+      meshSphere.position.y = meshSphere.geometry.parameters.radius;
+    }
 
     if (withGui) {
-      console.log('meshSphere  > ', meshSphere);
+      // console.log('meshSphere  > ', meshSphere);
       var sphereFolder = this.gui.addFolder('folder-' + name);
-      sphereFolder.add(meshSphere.material, 'shininess', 0, 100);
+      if (meshSphere.material && 'shininess' in meshSphere.material) {
+        sphereFolder.add(meshSphere.material, 'shininess', 0, 1000);
+      }
+      if (meshSphere.material && 'roughness' in meshSphere.material) {
+        sphereFolder.add(meshSphere.material, 'roughness', 0, 1);
+      }
+      if (meshSphere.material && 'metalness' in meshSphere.material) {
+        sphereFolder.add(meshSphere.material, 'metalness', 0, 1);
+      }
       sphereFolder.open();
     }
 
@@ -281,9 +293,17 @@ export class TextureMaterialSceneService {
     meshPlane.receiveShadow = true;
 
     if (withGui) {
-      var sphereFolder = this.gui.addFolder('folder-' + name);
-      sphereFolder.add(meshPlane.material, 'shininess', 0, 100);
-      sphereFolder.open();
+      var planeFolder = this.gui.addFolder('folder-' + name);
+      if (meshPlane.material && 'shininess' in meshPlane.material) {
+        planeFolder.add(meshPlane.material, 'shininess', 0, 1000);
+      }
+      if (meshPlane.material && 'roughness' in meshPlane.material) {
+        planeFolder.add(meshPlane.material, 'roughness', 0, 1);
+      }
+      if (meshPlane.material && 'metalness' in meshPlane.material) {
+        planeFolder.add(meshPlane.material, 'metalness', 0, 1);
+      }
+      planeFolder.open();
     }
 
     this.scene.add(meshPlane);
