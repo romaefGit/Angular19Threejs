@@ -1,6 +1,7 @@
 import { Injectable, OnDestroy, NgZone, ElementRef } from '@angular/core';
 import * as dat from 'dat.gui';
 import * as THREE from 'three';
+import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { Position } from '../../models/position.model';
 import { GeometryTypes } from '../../models/geometry.type';
@@ -23,6 +24,7 @@ export class GeometrySceneService {
 
   // Lights
   private pointLight: THREE.PointLight | undefined;
+  private directionalLight: THREE.DirectionalLight | undefined;
 
   // Reflection cube
   private reflectionCube: any;
@@ -199,6 +201,42 @@ export class GeometrySceneService {
     if (sphere) spotLight.add(sphere);
     this.scene.add(spotLight);
     // return light;
+  }
+
+  addDirectionalLight(
+    objectName: string,
+    color: string = '#fff',
+    intensity: number,
+    withGui: boolean = true,
+    withHelper: boolean = false
+  ) {
+    this.directionalLight = new THREE.DirectionalLight(color, intensity);
+    this.directionalLight.castShadow = true;
+
+    // Shadow
+    this.directionalLight.shadow.camera.left = -10;
+    this.directionalLight.shadow.camera.bottom = -10;
+    this.directionalLight.shadow.camera.right = 10;
+    this.directionalLight.shadow.camera.top = 10;
+
+    // Position
+    this.directionalLight.position.x = 13;
+    this.directionalLight.position.y = 10;
+    this.directionalLight.position.z = 10;
+    this.directionalLight.intensity = 2;
+
+    if (withGui) {
+      this.gui.add(this.directionalLight, 'intensity', 0, 10);
+      this.gui.add(this.directionalLight.position, 'x', 0, 20);
+      this.gui.add(this.directionalLight.position, 'y', 0, 20);
+      this.gui.add(this.directionalLight.position, 'z', 0, 20);
+    }
+
+    // element for that light like a Gizmo
+    let sphere = this.scene.getObjectByName(objectName);
+    if (sphere) this.directionalLight.add(sphere);
+
+    this.scene.add(this.directionalLight);
   }
 
   async addSphere(
@@ -405,6 +443,43 @@ export class GeometrySceneService {
     this.scene.background = reflectionCube;
 
     this.reflectionCube = reflectionCube;
+  }
+
+  setExternalModel() {
+    let loader = new OBJLoader();
+    let textureLoader = new THREE.TextureLoader();
+    let _this = this;
+    loader.load(
+      '/assets/models/neil/textures_and_color_neil_medium.obj',
+      function (object) {
+        let colorMap = textureLoader.load('/assets/models/head/Face_Color.jpg');
+        let bumpMap = textureLoader.load('/assets/models/head/Face_Disp.jpg');
+        let faceMaterial = _this.getMaterial('standard', '#497D74', true);
+
+        object.traverse((child: any) => {
+          if (child.name == 'Plane') {
+            child.visible = false;
+          }
+          if (child.name == 'Infinite') {
+            child.material = faceMaterial;
+            faceMaterial.roughness = 0.875;
+            faceMaterial.map = colorMap;
+            faceMaterial.bumpMap = bumpMap;
+            faceMaterial.roughnessMap = bumpMap;
+            faceMaterial.metalness = 0;
+            faceMaterial.bumpScale = 0.175;
+          }
+        });
+
+        object.scale.x = 20;
+        object.scale.y = 20;
+        object.scale.z = 20;
+
+        object.position.z = 0;
+        object.position.y = -2;
+        _this.scene.add(object);
+      }
+    );
   }
 
   /**

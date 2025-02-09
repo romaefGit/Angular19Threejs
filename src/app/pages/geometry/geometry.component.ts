@@ -18,7 +18,7 @@ export class GeometryComponent {
     let sceneColor = '#213555';
 
     let spotLightColor = '#FFFDEC';
-    let directionalLightColor = '#CDC1FF';
+    let directionalLightColor = '#497D74';
     let ambientLightColor = '#DA498D';
 
     this.geometrySceneService.initGui(); // Set controls UI
@@ -27,6 +27,25 @@ export class GeometryComponent {
       false,
       true,
       sceneColor
+    );
+
+    // Directional Light
+    this.geometrySceneService.addSphere(
+      0.05,
+      24,
+      24,
+      'directi',
+      directionalLightColor,
+      this.geometrySceneService.getMaterial('basic'),
+      false,
+      false
+    );
+    this.geometrySceneService.addDirectionalLight(
+      'directi',
+      directionalLightColor,
+      1,
+      false,
+      true
     );
 
     // Spot Left Light
@@ -109,9 +128,12 @@ export class GeometryComponent {
       60,
       Math.PI / 2,
       'planito',
-      this.geometrySceneService.getMaterial('standard', '#CDC1FF', wireframe),
+      this.geometrySceneService.getMaterial('standard', '#DA498D', wireframe),
       withGui
     );
+
+    // External model
+    this.geometrySceneService.setExternalModel();
 
     this.geometrySceneService.addCubeMap();
 
