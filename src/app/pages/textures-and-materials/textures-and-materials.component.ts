@@ -97,12 +97,28 @@ export class TexturesAndMaterialsComponent {
       // }
     );
 
+    // small
+    this.textureMaterialService.addSphere(
+      0.5,
+      25,
+      25,
+      'spherei-small',
+      '#fff',
+      this.textureMaterialService.getMaterial('standard', '#CDC1FF'),
+      true,
+      true,
+      {
+        x: -2,
+        z: -0.4,
+      }
+    );
+
     // It use radiants, so we have to pass that math operation to say rotate 90 degrees
     this.textureMaterialService.setPlane(
       300,
       Math.PI / 2,
       'planito',
-      this.textureMaterialService.getMaterial('standard', 'rgb(255, 255, 255)'),
+      this.textureMaterialService.getMaterial('standard', '#ddd)'),
       true
     );
 
