@@ -12,6 +12,17 @@ export class GeometryComponent {
   @ViewChild('geometryScene', { static: true })
   public geometryCanvas!: ElementRef<HTMLCanvasElement>;
 
+  public geoTypes: GeometryTypes[] = [
+    'box',
+    'cone',
+    'cylinder',
+    'sphere',
+    'torus',
+    'torusKnot',
+    'octahedron',
+    'tetrahedron',
+  ];
+
   public constructor(private geometrySceneService: GeometrySceneService) {}
 
   public ngOnInit(): void {
@@ -98,45 +109,94 @@ export class GeometryComponent {
       positionRightLight
     );
 
-    // Choose one type of geometry
-    var geoTypes: GeometryTypes[] = [
-      // <-- Key change: Array of GeometryTypes
-      // 'box',
-      // 'cone',
-      // 'cylinder',
-      // 'sphere',
-      // 'torus',
-      'torusKnot',
-      // 'octahedron',
-      // 'tetrahedron',
-    ];
-
-    this.geometrySceneService.createGeometry(
-      'test',
-      geoTypes[0],
-      2,
-      'phong',
-      false,
-      '#DA498D'
-    );
+    // Create geometries
+    this.createRoundGeometries(1, 4, 2);
 
     // Wave plane
     let wireframe = false;
     let withGui = true;
     this.geometrySceneService.setWavePlane(
-      30,
+      15,
       60,
       Math.PI / 2,
       'planito',
-      this.geometrySceneService.getMaterial('standard', '#DA498D', wireframe),
+      this.geometrySceneService.getMaterial('standard', '#000', wireframe),
       withGui
     );
 
     // External model
-    this.geometrySceneService.setExternalModel();
+    let faceModel: any = {
+      obj: '/assets/models/head/lee-perry-smith-head-scan.obj',
+      scale: {
+        x: 4,
+        y: 4,
+        z: 4,
+      },
+      position: {
+        x: 1,
+        y: 0,
+        z: 0.5,
+      },
+      colorMap: '/assets/models/head/Face_Color.jpg',
+      bumpMap: '/assets/models/head/Face_Disp.jpg',
+    };
+    this.geometrySceneService.setExternalModel(
+      faceModel.obj,
+      faceModel.scale,
+      faceModel.position,
+      faceModel.colorMap,
+      faceModel.bumpMap
+    );
+
+    // Neil model
+    let neilModel: any = {
+      obj: '/assets/models/neil/textures_and_color_neil_medium.obj',
+      scale: {
+        x: 2,
+        y: 2,
+        z: 2,
+      },
+      position: {
+        x: -1,
+        y: 0.3,
+        z: 0,
+      },
+    };
+    this.geometrySceneService.setExternalModel(
+      neilModel.obj,
+      neilModel.scale,
+      neilModel.position
+    );
 
     this.geometrySceneService.addCubeMap();
 
     this.geometrySceneService.startScene();
+  }
+
+  createRoundGeometries(
+    size: number = 2,
+    radius: number = 4,
+    yPos: number = 3
+  ) {
+    for (let i = 0; i < this.geoTypes.length; i++) {
+      const randomType = this.geoTypes[i];
+      const angle = (i / this.geoTypes.length) * 2 * Math.PI; // Calculate angle for each element
+
+      let position = {
+        x: Math.cos(angle) * radius, // x = radius * cos(angle)
+        z: Math.sin(angle) * radius, // z = radius * sin(angle)
+        y: yPos,
+      };
+
+      this.geometrySceneService.createGeometry(
+        'geometry' + i,
+        randomType,
+        size,
+        'standard',
+        true,
+        '#DA498D',
+        position
+      );
+    }
   }
 }

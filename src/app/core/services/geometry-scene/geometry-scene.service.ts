@@ -362,9 +362,9 @@ export class GeometrySceneService {
     // Textures
     meshWave = await this.setTextures(
       meshWave,
-      'assets/textures/concrete.jpg',
+      'assets/textures/checkerboard.jpg',
       ['map', 'bumpMap', 'roughnessMap'],
-      15
+      3
     );
     // values
     meshWave.material.bumpScale = 5;
@@ -419,15 +419,15 @@ export class GeometrySceneService {
   }
 
   addCubeMap() {
-    let path = 'assets/cubemap/';
+    let path = 'assets/cubemap/Storforsen/';
     let format = '.jpg';
     let urls = [
-      path + 'px' + format,
-      path + 'nx' + format,
-      path + 'py' + format,
-      path + 'ny' + format,
-      path + 'pz' + format,
-      path + 'nz' + format,
+      path + 'posx' + format,
+      path + 'negx' + format,
+      path + 'posy' + format,
+      path + 'negy' + format,
+      path + 'posz' + format,
+      path + 'negz' + format,
     ];
     let reflectionCube = new THREE.CubeTextureLoader().load(urls);
     reflectionCube.format = THREE.RGBAFormat;
@@ -437,42 +437,63 @@ export class GeometrySceneService {
     this.reflectionCube = reflectionCube;
   }
 
-  setExternalModel() {
+  setExternalModel(
+    pathObj: string,
+    scale: Position = {
+      x: 1,
+      y: 1,
+      z: 1,
+    },
+    position: Position = {
+      x: 0,
+      y: 0,
+      z: 0,
+    },
+    colorMapPath?: string,
+    bumpMapPath?: string
+  ) {
     let loader = new OBJLoader();
     let textureLoader = new THREE.TextureLoader();
     let _this = this;
-    loader.load(
-      // '/assets/models/head/lee-perry-smith-head-scan.obj',
-      '/assets/models/neil/textures_and_color_neil_medium.obj',
-      function (object) {
-        let colorMap = textureLoader.load('/assets/models/head/Face_Color.jpg');
-        let bumpMap = textureLoader.load('/assets/models/head/Face_Disp.jpg');
-        let faceMaterial = _this.getMaterial('standard', '#fff', false);
 
-        object.traverse((child: any) => {
-          if (child.name == 'Plane') {
-            child.visible = false;
-          }
-          if (child.name == 'Infinite') {
-            child.material = faceMaterial;
-            faceMaterial.roughness = 0.875;
-            faceMaterial.map = colorMap;
-            faceMaterial.bumpMap = bumpMap;
-            faceMaterial.roughnessMap = bumpMap;
-            faceMaterial.metalness = 0;
-            faceMaterial.bumpScale = 0.175;
-          }
-        });
+    // console.log(pathObj, scale, colorMapPath, bumpMapPath);
 
-        object.scale.x = 20;
-        object.scale.y = 20;
-        object.scale.z = 20;
+    loader.load(pathObj, (object) => {
+      let colorMap: any;
+      let bumpMap: any;
 
-        object.position.z = 0;
-        object.position.y = -2;
-        _this.scene.add(object);
+      if (colorMapPath) {
+        colorMap = textureLoader.load(colorMapPath);
       }
-    );
+      if (bumpMapPath) {
+        bumpMap = textureLoader.load(bumpMapPath);
+      }
+      let objMaterial = _this.getMaterial('standard', '#fff', false);
+
+      object.traverse((child: any) => {
+        if (child.name == 'Plane') {
+          child.visible = false;
+        }
+        if (child.name == 'Infinite') {
+          child.material = objMaterial;
+          objMaterial.roughness = 0.875;
+          if (colorMapPath) objMaterial.map = colorMap;
+          if (bumpMapPath) objMaterial.bumpMap = bumpMap;
+          if (bumpMapPath) objMaterial.roughnessMap = bumpMap;
+          objMaterial.metalness = 0;
+          objMaterial.bumpScale = 0.175;
+        }
+      });
+
+      if (scale.x) object.scale.x = scale.x;
+      if (scale.y) object.scale.y = scale.y;
+      if (scale.z) object.scale.z = scale.z;
+
+      if (position.x) object.position.x = position.x;
+      if (position.y) object.position.y = position.y;
+      if (position.z) object.position.z = position.z;
+      _this.scene.add(object);
+    });
   }
 
   /**
@@ -551,7 +572,8 @@ export class GeometrySceneService {
     size: number,
     materialType: MaterialTypes,
     wireframe: boolean,
-    color: string = '#fff'
+    color: string = '#fff',
+    position?: Position
   ) {
     let geometry;
     let segmentMultiplier = 0.25;
@@ -609,6 +631,14 @@ export class GeometrySceneService {
     let mesh = new THREE.Mesh(geometry, mate);
     mesh.castShadow = true;
     mesh.name = type + '-' + name;
+
+    // Position the geometry
+    if (position) {
+      if (position.x) mesh.position.x = position.x;
+      if (position.z) mesh.position.z = position.z;
+      if (position.y) mesh.position.y = position.y;
+      // mesh.position.y = size / 2; // Position on the "ground" (adjust as needed)
+    }
 
     this.scene.add(mesh);
   }

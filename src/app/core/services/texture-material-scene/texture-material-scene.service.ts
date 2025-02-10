@@ -305,15 +305,15 @@ export class TextureMaterialSceneService {
   }
 
   addCubeMap() {
-    let path = 'assets/cubemap/';
+    let path = 'assets/cubemap/nightstreet/';
     let format = '.jpg';
     let urls = [
-      path + 'px' + format,
-      path + 'nx' + format,
-      path + 'py' + format,
-      path + 'ny' + format,
-      path + 'pz' + format,
-      path + 'nz' + format,
+      path + 'posx' + format,
+      path + 'negx' + format,
+      path + 'posy' + format,
+      path + 'negy' + format,
+      path + 'posz' + format,
+      path + 'negz' + format,
     ];
     let reflectionCube = new THREE.CubeTextureLoader().load(urls);
     reflectionCube.format = THREE.RGBAFormat;
