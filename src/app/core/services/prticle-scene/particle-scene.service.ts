@@ -1,6 +1,11 @@
 import { Injectable, OnDestroy, NgZone, ElementRef } from '@angular/core';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
+import { VignetteShader } from 'three/examples/jsm/shaders/VignetteShader.js';
+import { RGBShiftShader } from 'three/examples/jsm/shaders/RGBShiftShader.js';
 
 @Injectable({
   providedIn: 'root',
@@ -22,6 +27,7 @@ export class ParticleSceneService {
     renderer: THREE.WebGLRenderer,
     scene: THREE.Scene,
     camera: THREE.PerspectiveCamera,
+    composer: EffectComposer,
     controls: OrbitControls
   ) {
     // console.log('it enters always?');
@@ -43,7 +49,7 @@ export class ParticleSceneService {
     this.animateParticles();
 
     requestAnimationFrame(function () {
-      _this.update(renderer, scene, camera, controls);
+      _this.update(renderer, scene, camera, composer, controls);
     });
   }
 
@@ -64,9 +70,22 @@ export class ParticleSceneService {
       });
     });
 
+    var composer = new EffectComposer(this.renderer);
+    var renderPass = new RenderPass(this.scene, this.camera);
+    composer.addPass(renderPass);
+
+    var vignetteEffect = new ShaderPass(VignetteShader);
+    vignetteEffect.uniforms['darkness'].value = 2;
+    composer.addPass(vignetteEffect);
+
+    var rgbShiftShader = new ShaderPass(RGBShiftShader);
+    rgbShiftShader.uniforms['amount'].value = 0.003;
+    rgbShiftShader.renderToScreen = true;
+    composer.addPass(rgbShiftShader);
+
     let controls = new OrbitControls(this.camera, this.renderer.domElement);
 
-    this.update(this.renderer, this.scene, this.camera, controls);
+    this.update(this.renderer, this.scene, this.camera, composer, controls);
   }
 
   createScene(
@@ -123,7 +142,7 @@ export class ParticleSceneService {
   addBox(w: number, h: number, d: number, name: string = ''): void {
     let geometry = new THREE.BoxGeometry(w, h, d);
     let material = new THREE.MeshBasicMaterial({
-      color: 0x6a5acd,
+      color: '#ddd',
     });
 
     let meshBox = new THREE.Mesh(geometry, material);

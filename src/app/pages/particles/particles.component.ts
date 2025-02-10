@@ -20,10 +20,12 @@ export class ParticlesComponent {
       false,
       true
     );
-    // this.particleSceneService.addBox(1, 1, 1, 'boxy');
+    // Box
+    this.particleSceneService.addBox(1, 1, 1, 'boxy');
 
-    // // It use radiants, so we have to pass that math operation to say rotate 90 degrees
-    // this.particleSceneService.setPlane(4, Math.PI / 2, 'planito');
+    // Plane
+    // It use radiants, so we have to pass that math operation to say rotate 90 degrees
+    this.particleSceneService.setPlane(4, Math.PI / 2, 'planito');
 
     this.particleSceneService.createParticles(8000);
 
