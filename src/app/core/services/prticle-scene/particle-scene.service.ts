@@ -142,7 +142,7 @@ export class ParticleSceneService {
   addBox(w: number, h: number, d: number, name: string = ''): void {
     let geometry = new THREE.BoxGeometry(w, h, d);
     let material = new THREE.MeshBasicMaterial({
-      color: '#ddd',
+      color: '#71BBB2',
     });
 
     let meshBox = new THREE.Mesh(geometry, material);

@@ -25,7 +25,7 @@ export class ParticlesComponent {
 
     // Plane
     // It use radiants, so we have to pass that math operation to say rotate 90 degrees
-    this.particleSceneService.setPlane(4, Math.PI / 2, 'planito');
+    // this.particleSceneService.setPlane(4, Math.PI / 2, 'planito');
 
     this.particleSceneService.createParticles(8000);
 
