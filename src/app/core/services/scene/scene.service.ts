@@ -52,10 +52,10 @@ export class SceneService implements OnDestroy {
           this.render();
         });
       }
+    });
 
-      window.addEventListener('resize', () => {
-        this.resize();
-      });
+    window.addEventListener('resize', () => {
+      this.resize();
     });
 
     this.update(this.renderer, this.scene, this.camera);
@@ -142,13 +142,12 @@ export class SceneService implements OnDestroy {
   }
 
   resize(): void {
-    const width = window.innerWidth;
-    const height = window.innerHeight;
+    const width = window.innerWidth; // Get the window width
+    const height = window.innerHeight; // Get the window height
 
-    this.camera.aspect = width / height;
-    this.camera.updateProjectionMatrix();
-
-    this.renderer.setSize(width, height);
+    this.renderer.setSize(width, height, true); // Set the renderer size
+    this.camera.aspect = width / height; // Update camera aspect ratio
+    this.camera.updateProjectionMatrix(); // Update projection matrix
   }
 
   ngOnDestroy(): void {

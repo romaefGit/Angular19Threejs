@@ -64,10 +64,10 @@ export class GeometrySceneService {
           this.render();
         });
       }
+    });
 
-      window.addEventListener('resize', () => {
-        this.resize();
-      });
+    window.addEventListener('resize', () => {
+      this.resize();
     });
 
     let controls = new OrbitControls(this.camera, this.renderer.domElement);
@@ -145,18 +145,9 @@ export class GeometrySceneService {
 
     // console.log('sphere > ', sphere);
     if (withGui) {
-      this.gui
-        .add(this.pointLight, 'intensity', 0, 10)
-        .onChange((value: any) => {
-          // No need to update the scene manually here, Three.js does it
-          // console.log('Intensity changed:', value);
-        });
-
-      this.gui
-        .add(this.pointLight.position, 'y', 0, 5)
-        .onChange((value: any) => {
-          // console.log('Y position changed:', value);
-        });
+      let folderLight = this.gui.addFolder('folder-' + objectName);
+      folderLight.add(this.pointLight, 'intensity', 0, 10);
+      folderLight.add(this.pointLight, 'intensity', 0, 10);
     }
 
     if (sphere) this.pointLight.add(sphere);
@@ -226,10 +217,11 @@ export class GeometrySceneService {
     this.directionalLight.intensity = 2;
 
     if (withGui) {
-      this.gui.add(this.directionalLight, 'intensity', 0, 10);
-      this.gui.add(this.directionalLight.position, 'x', 0, 20);
-      this.gui.add(this.directionalLight.position, 'y', 0, 20);
-      this.gui.add(this.directionalLight.position, 'z', 0, 20);
+      let folderDirLight = this.gui.addFolder('folder-' + objectName);
+      folderDirLight.add(this.directionalLight, 'intensity', 0, 10);
+      folderDirLight.add(this.directionalLight.position, 'x', 0, 20);
+      folderDirLight.add(this.directionalLight.position, 'y', 0, 20);
+      folderDirLight.add(this.directionalLight.position, 'z', 0, 20);
     }
 
     // element for that light like a Gizmo
@@ -630,13 +622,12 @@ export class GeometrySceneService {
   }
 
   resize(): void {
-    const width = window.innerWidth;
-    const height = window.innerHeight;
+    const width = window.innerWidth; // Get the window width
+    const height = window.innerHeight; // Get the window height
 
-    this.camera.aspect = width / height;
-    this.camera.updateProjectionMatrix();
-
-    this.renderer.setSize(width, height);
+    this.renderer.setSize(width, height, true); // Set the renderer size
+    this.camera.aspect = width / height; // Update camera aspect ratio
+    this.camera.updateProjectionMatrix(); // Update projection matrix
   }
 
   ngOnDestroy(): void {

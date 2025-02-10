@@ -2,8 +2,12 @@ import { Routes } from '@angular/router';
 
 export const routes: Routes = [
   {
-    path: '',
-    // path: 'particles',
+    path: '', // Empty path
+    redirectTo: 'lighting', // Redirect to 'lighting'
+    pathMatch: 'full', // Important: Match the full path
+  },
+  {
+    path: 'particles',
     loadComponent: () =>
       import('./pages/particles/particles.component').then(
         (c) => c.ParticlesComponent
@@ -31,13 +35,6 @@ export const routes: Routes = [
       ),
   },
   {
-    path: 'textures-and-materials',
-    loadComponent: () =>
-      import(
-        './pages/textures-and-materials/textures-and-materials.component'
-      ).then((c) => c.TexturesAndMaterialsComponent),
-  },
-  {
     path: 'lighting',
     loadComponent: () =>
       import('./pages/lighting/lighting.component').then(
@@ -56,13 +53,6 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./pages/simple-scene/simple-scene.component').then(
         (c) => c.SimpleSceneComponent
-      ),
-  },
-  {
-    path: 'cube',
-    loadComponent: () =>
-      import('./components/engine/engine.component').then(
-        (c) => c.EngineComponent
       ),
   },
 ];

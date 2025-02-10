@@ -1,0 +1,29 @@
+<nav>
+  <div class="navbar">
+    <div class="navbar__logo reverse">
+      <div class="navbar__hamburger" (click)="openNav()">&#9776;</div>
+      <div>Three<span>.js</span></div>
+    </div>
+    <div class="navbar__links">
+      @for (item of sections; track $index) {
+      <a [href]="item.path" [ngClass]="{ active: item.path == activePath }">{{
+        item.name
+      }}</a>
+      }
+    </div>
+  </div>
+</nav>
+<!-- Mobile Menu -->
+@if(isOpen) {
+<div class="sidenav">
+  <div class="navbar__logo reverse">
+    <div>Three<span>.js</span></div>
+  </div>
+  <button class="sidenav__closebtn" (click)="closeNav()">&times;</button>
+  @for (item of sections; track $index) {
+  <a [href]="item.path" [ngClass]="{ active: item.path == activePath }">{{
+    item.name
+  }}</a>
+  }
+</div>
+}

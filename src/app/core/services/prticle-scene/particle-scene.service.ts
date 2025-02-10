@@ -27,7 +27,6 @@ export class ParticleSceneService {
     renderer: THREE.WebGLRenderer,
     scene: THREE.Scene,
     camera: THREE.PerspectiveCamera,
-    composer: EffectComposer,
     controls: OrbitControls
   ) {
     // console.log('it enters always?');
@@ -49,7 +48,7 @@ export class ParticleSceneService {
     this.animateParticles();
 
     requestAnimationFrame(function () {
-      _this.update(renderer, scene, camera, composer, controls);
+      _this.update(renderer, scene, camera, controls);
     });
   }
 
@@ -64,28 +63,28 @@ export class ParticleSceneService {
           this.render();
         });
       }
-
-      window.addEventListener('resize', () => {
-        this.resize();
-      });
     });
 
-    var composer = new EffectComposer(this.renderer);
-    var renderPass = new RenderPass(this.scene, this.camera);
-    composer.addPass(renderPass);
+    window.addEventListener('resize', () => {
+      this.resize();
+    });
 
-    var vignetteEffect = new ShaderPass(VignetteShader);
-    vignetteEffect.uniforms['darkness'].value = 2;
-    composer.addPass(vignetteEffect);
+    // var composer = new EffectComposer(this.renderer);
+    // var renderPass = new RenderPass(this.scene, this.camera);
+    // composer.addPass(renderPass);
 
-    var rgbShiftShader = new ShaderPass(RGBShiftShader);
-    rgbShiftShader.uniforms['amount'].value = 0.003;
-    rgbShiftShader.renderToScreen = true;
-    composer.addPass(rgbShiftShader);
+    // var vignetteEffect = new ShaderPass(VignetteShader);
+    // vignetteEffect.uniforms['darkness'].value = 2;
+    // composer.addPass(vignetteEffect);
+
+    // var rgbShiftShader = new ShaderPass(RGBShiftShader);
+    // rgbShiftShader.uniforms['amount'].value = 0.003;
+    // rgbShiftShader.renderToScreen = true;
+    // composer.addPass(rgbShiftShader);
 
     let controls = new OrbitControls(this.camera, this.renderer.domElement);
 
-    this.update(this.renderer, this.scene, this.camera, composer, controls);
+    this.update(this.renderer, this.scene, this.camera, controls);
   }
 
   createScene(
@@ -263,13 +262,12 @@ export class ParticleSceneService {
   }
 
   resize(): void {
-    const width = window.innerWidth;
-    const height = window.innerHeight;
+    const width = window.innerWidth; // Get the window width
+    const height = window.innerHeight; // Get the window height
 
-    this.camera.aspect = width / height;
-    this.camera.updateProjectionMatrix();
-
-    this.renderer.setSize(width, height);
+    this.renderer.setSize(width, height, true); // Set the renderer size
+    this.camera.aspect = width / height; // Update camera aspect ratio
+    this.camera.updateProjectionMatrix(); // Update projection matrix
   }
 
   ngOnDestroy(): void {

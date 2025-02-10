@@ -34,11 +34,11 @@ export class LightingComponent {
 
     // Point Light
     this.lightSceneService.addSphere(0.05, 24, 24, 'boli', lightColor);
-    this.lightSceneService.addLight('boli', lightColor, 2, 2, false);
+    this.lightSceneService.addLight('boli', lightColor, 2, 2, true);
 
     // Spot Light
     this.lightSceneService.addSphere(0.05, 24, 24, 'spoti', spotLightColor);
-    this.lightSceneService.addSpotLight('spoti', spotLightColor, 6, false);
+    this.lightSceneService.addSpotLight('spoti', spotLightColor, 6, true);
 
     // Directional Light
     this.lightSceneService.addSphere(

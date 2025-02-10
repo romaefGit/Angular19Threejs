@@ -44,7 +44,7 @@ export class TextureMaterialSceneService {
 
   initGui(): void {
     this.gui = new dat.GUI();
-    let folderEmpty = this.gui.addFolder('SOMETHING'); // This solves a problem with the first real creation of a folder
+    this.gui.addFolder('SOMETHING'); // This solves a problem with the first real creation of a folder
   }
 
   startScene(): void {
@@ -58,10 +58,10 @@ export class TextureMaterialSceneService {
           this.render();
         });
       }
+    });
 
-      window.addEventListener('resize', () => {
-        this.resize();
-      });
+    window.addEventListener('resize', () => {
+      this.resize();
     });
 
     let controls = new OrbitControls(this.camera, this.renderer.domElement);
@@ -397,13 +397,12 @@ export class TextureMaterialSceneService {
   }
 
   resize(): void {
-    const width = window.innerWidth;
-    const height = window.innerHeight;
+    const width = window.innerWidth; // Get the window width
+    const height = window.innerHeight; // Get the window height
 
-    this.camera.aspect = width / height;
-    this.camera.updateProjectionMatrix();
-
-    this.renderer.setSize(width, height);
+    this.renderer.setSize(width, height, true); // Set the renderer size
+    this.camera.aspect = width / height; // Update camera aspect ratio
+    this.camera.updateProjectionMatrix(); // Update projection matrix
   }
 
   ngOnDestroy(): void {

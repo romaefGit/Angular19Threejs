@@ -1,0 +1,149 @@
+body {
+  margin: 0;
+  background-color: #e9ebee;
+}
+
+a {
+  font-family: "Open Sans", sans-serif;
+  cursor: pointer;
+}
+
+$--c-primary: #b483b1;
+$--t-color: #333;
+
+/* =======================
+******* Desktop Menu ******
+========================*/
+.navbar {
+  position: fixed;
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  height: 100px;
+  background-color: #fcfcfc;
+  // padding: 0 40px;
+  box-shadow: -1px 4px 5px 0px rgba(209, 205, 209, 1);
+
+  &__logo {
+    margin-left: 32px;
+    font-family: "Open Sans", sans-serif;
+    font-size: 30px;
+    font-weight: 700;
+    color: $--t-color;
+    text-transform: capitalize;
+
+    & span {
+      color: $--c-primary;
+    }
+  }
+
+  &__hamburger {
+    font-size: 30px;
+    cursor: pointer;
+    font-weight: bold;
+    display: none; // Hidden on larger screens
+  }
+
+  &__links {
+    margin-right: 32px;
+    display: flex;
+    gap: 1.5em;
+    font-family: "Open Sans", sans-serif;
+
+    & a {
+      text-decoration: none;
+      color: $--t-color;
+      text-transform: capitalize;
+      font-weight: bold;
+      &.active {
+        color: $--c-primary;
+        font-weight: bold;
+      }
+      &:hover {
+        color: $--c-primary;
+      }
+    }
+  }
+}
+
+/* =======================
+******* Mobile Menu ******
+========================*/
+.sidenav {
+  height: 100%;
+  width: 50%;
+  position: fixed;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  background-color: #ffffff;
+  overflow-x: hidden;
+  transition: 0.5s;
+  padding-top: 32px;
+
+  & a {
+    padding: 8px 8px 8px 32px;
+    text-decoration: none;
+    font-size: 25px;
+    color: $--t-color;
+    display: block;
+    transition: 0.3s;
+    &.active {
+      color: $--c-primary;
+      font-weight: bold;
+    }
+
+    &:hover {
+      color: $--c-primary;
+    }
+  }
+
+  &__closebtn {
+    cursor: pointer;
+    position: absolute;
+    top: 6px;
+    right: 17px;
+    font-size: 48px;
+    margin-left: 50px;
+    background: transparent;
+    border: none;
+    color: $--c-primary;
+    padding: 0;
+  }
+}
+
+/* Mobile to Tablet  */
+@media (min-width: 320px) and (max-width: 767px) {
+  .navbar {
+    display: inline-flex;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 20px;
+    padding: 0 16px;
+
+    &__hamburger {
+      display: flex;
+      padding-right: 16px;
+    }
+
+    &__links {
+      display: none;
+      flex-direction: column;
+      margin-top: 20px;
+    }
+
+    &__logo {
+      display: flex;
+      margin-bottom: 10px;
+    }
+  }
+}
+
+/* Tablet to Desktop */
+@media (min-width: 768px) {
+  .navbar__hamburger {
+    display: none;
+  }
+}
