@@ -141,6 +141,13 @@ $--t-color: #333;
   }
 }
 
+// Mobile
+@media (min-width: 320px) and (max-width: 420px) {
+  .sidenav {
+    width: 88%;
+  }
+}
+
 /* Tablet to Desktop */
 @media (min-width: 768px) {
   .navbar__hamburger {
