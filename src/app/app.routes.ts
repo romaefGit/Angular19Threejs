@@ -3,7 +3,14 @@ import { Routes } from '@angular/router';
 export const routes: Routes = [
   {
     path: '',
-    // path: 'geometry',
+    // path: 'particles',
+    loadComponent: () =>
+      import('./pages/particles/particles.component').then(
+        (c) => c.ParticlesComponent
+      ),
+  },
+  {
+    path: 'geometry',
     loadComponent: () =>
       import('./pages/geometry/geometry.component').then(
         (c) => c.GeometryComponent
