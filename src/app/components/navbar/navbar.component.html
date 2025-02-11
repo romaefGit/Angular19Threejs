@@ -30,9 +30,16 @@
 <div class="sidenav">
   <button class="sidenav__closebtn" (click)="closeNav()">&times;</button>
   @for (item of sections; track $index) {
-  <a [href]="item.path" [ngClass]="{ active: item.path == activePath }">{{
-    item.name
-  }}</a>
+  <a
+    [href]="item.path"
+    [ngClass]="{ active: item.path == activePath }"
+    [target]="item.icon ? '_blank' : '_self'"
+  >
+    {{ item.name }}
+    @if(item.icon) {
+    <img class="icon" [src]="item.icon" [alt]="item.name" />
+    }
+  </a>
   }
 </div>
 }

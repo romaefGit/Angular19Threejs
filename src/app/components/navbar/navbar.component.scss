@@ -110,6 +110,10 @@ $--t-color: #333;
       font-weight: bold;
     }
 
+    & .icon {
+      width: 30px;
+    }
+
     &:hover {
       color: $--c-primary;
     }
