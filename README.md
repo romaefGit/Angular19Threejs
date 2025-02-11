@@ -1,13 +1,28 @@
-# Angular18Threejs
+# Angular19 + Threejs
+
+![](https://threejs-angular-playground.web.app/assets/og_image.jpg)
+
+I recently dove into Three.js to explore the world of 3D graphics for the web.
+While learning, I took on the challenge of translating a tutorial to Angular 19,
+making it even more dynamic and adaptable to modern web applications.
 
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.0.7.
+and [Three.js](https://threejs.org/) version 0.164.1
+
+Developed by [Romario](https://romaefportfolio.web.app/)
 
 ## Development server
 
 To start a local development server, run:
 
 ```bash
-ng serve
+npm install
+```
+
+then
+
+```bash
+npm start
 ```
 
 Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.

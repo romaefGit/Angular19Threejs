@@ -14,7 +14,7 @@
       <a
         [href]="item.path"
         [ngClass]="{ active: item.path == activePath }"
-        [target]="item.icon ? '_blank' : null"
+        [target]="item.icon ? '_blank' : '_self'"
       >
         {{ item.name }}
         @if(item.icon) {
