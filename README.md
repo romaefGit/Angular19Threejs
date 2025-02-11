@@ -2,18 +2,17 @@
 
 ![](https://threejs-angular-playground.web.app/assets/og_image.jpg)
 
-I recently dove into Three.js to explore the world of 3D graphics for the web.
-While learning, I took on the challenge of translating a tutorial to Angular 19,
+I recently dove into [Three.js](https://threejs.org/) to explore the world of 3D graphics for the web.
+While learning, I took on the challenge of translating a tutorial to [Angular 19](https://angular.dev/),
 making it even more dynamic and adaptable to modern web applications.
-
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.0.7.
-and [Three.js](https://threejs.org/) version 0.164.1
 
 Developed by [Romario](https://romaefportfolio.web.app/)
 
 ## Demo
 
 You can see the project running here [Demo](https://threejs-angular-playground.web.app/textures-and-materials)
+
+Give it a start if you like it.
 
 ## Development server
 
@@ -74,5 +73,7 @@ ng e2e
 Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
 
 ## Additional Resources
+
+This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.0.7.
 
 For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
