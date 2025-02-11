@@ -1,14 +1,26 @@
 <nav>
   <div class="navbar">
-    <div class="navbar__logo reverse">
+    <div class="navbar__logo">
       <div class="navbar__hamburger" (click)="openNav()">&#9776;</div>
-      <div>Three<span>.js</span></div>
+      <div class="navbar__title">
+        <img class="icon" src="/assets/icons/threejs.avif" alt="" srcset="" />
+        <span>+</span>
+        <img class="icon" src="/assets/icons/angular.avif" alt="" srcset="" />
+        <!-- <span>=</span> 3D magic -->
+      </div>
     </div>
     <div class="navbar__links">
       @for (item of sections; track $index) {
-      <a [href]="item.path" [ngClass]="{ active: item.path == activePath }">{{
-        item.name
-      }}</a>
+      <a
+        [href]="item.path"
+        [ngClass]="{ active: item.path == activePath }"
+        [target]="item.icon ? '_blank' : null"
+      >
+        {{ item.name }}
+        @if(item.icon) {
+        <img class="icon" [src]="item.icon" [alt]="item.name" />
+        }
+      </a>
       }
     </div>
   </div>
@@ -16,9 +28,6 @@
 <!-- Mobile Menu -->
 @if(isOpen) {
 <div class="sidenav">
-  <div class="navbar__logo reverse">
-    <div>Three<span>.js</span></div>
-  </div>
   <button class="sidenav__closebtn" (click)="closeNav()">&times;</button>
   @for (item of sections; track $index) {
   <a [href]="item.path" [ngClass]="{ active: item.path == activePath }">{{

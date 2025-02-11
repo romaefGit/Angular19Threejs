@@ -33,6 +33,12 @@ export class NavbarComponent {
       name: 'Particles',
       path: '/particles',
     },
+
+    {
+      name: '',
+      path: 'https://github.com/romaefGit/Angular19Threejs',
+      icon: '/assets/icons/github.avif',
+    },
   ];
 
   isOpen = false;
