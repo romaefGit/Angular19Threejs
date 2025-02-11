@@ -11,6 +11,10 @@ and [Three.js](https://threejs.org/) version 0.164.1
 
 Developed by [Romario](https://romaefportfolio.web.app/)
 
+## Demo
+
+You can see the project running here [Demo](https://threejs-angular-playground.web.app/textures-and-materials)
+
 ## Development server
 
 To start a local development server, run:
